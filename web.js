@@ -1,10 +1,10 @@
 // web.js
 var express = require("express"),
-	app = express(),
+	  app = express(),
     http = require('http'),
     path = require('path'),
     gapi = require('./lib/gapi'),
-	logfmt = require("logfmt");
+	  logfmt = require("logfmt");
 
 // mongo.Db.connect(mongoUri, function (err, db) {
 //   db.collection('mydocs', function(er, collection) {
@@ -12,6 +12,10 @@ var express = require("express"),
 //     });
 //   });
 // });
+
+var my_calendars = [],
+    my_profile = {},
+    my_email = '';
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
@@ -86,11 +90,28 @@ app.get('/oauth2callback', function(req, res) {
 var getData = function() {
   gapi.oauth.userinfo.get().withAuthClient(gapi.client).execute(function(err, results){
       console.log(results);
+      my_email = results.email;
+      my_profile.name = results.name;
+      my_profile.birthday = results.birthday;
   });
   gapi.cal.calendarList.list().withAuthClient(gapi.client).execute(function(err, results){
     console.log(results);
+    for (var i = results.items.length - 1; i >= 0; i--) {
+      my_calendars.push(results.items[i].summary);
+    };
   });
 };
+
+app.get('/cal', function(req, res){
+  var locals = {
+    title: "These are your calendars",
+    user: my_profile.name,
+    bday: my_profile.birthday,
+    events: my_calendars,
+    email: my_email
+  };
+  res.render('cal.jade', locals);
+});
 
 var port = Number(process.env.PORT || 5000);
 app.listen(port, function() {
