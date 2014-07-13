@@ -59,7 +59,7 @@ app.set('view engine', 'jade');
 app.get('/', function(req, res) {
 
 	var locals = {
-        title: 'This is Oshani sample app',
+        title: 'Photo Sharing App for HTTPA',
         url: gapi.url
     };
   	res.render('index.jade', locals);
@@ -84,7 +84,7 @@ app.get('/oauth2callback', function(req, res) {
         title: 'My sample app',
         url: gapi.url
       };
-  res.render('index.jade', locals);
+  res.render('cal.jade', locals);
 });
 
 var getData = function() {
