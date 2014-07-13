@@ -23,6 +23,8 @@
     "express": "^4.6.1",
     "logfmt": "^1.1.2",
     "mongodb": "^1.4.7",
-    "mongoose": "^3.8.12"
+    "mongoose": "^3.8.12",
+    "jade": "*",
+    "googleapis": "*"
   }
 }

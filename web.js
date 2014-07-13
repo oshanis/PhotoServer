@@ -1,7 +1,10 @@
 // web.js
-var express = require("express");
-var logfmt = require("logfmt");
-var app = express();
+var express = require("express"),
+	app = express(),
+    http = require('http'),
+    path = require('path'),
+    gapi = require('./lib/gapi'),
+	logfmt = require("logfmt");
 
 // mongo.Db.connect(mongoUri, function (err, db) {
 //   db.collection('mydocs', function(er, collection) {
@@ -45,17 +48,49 @@ MongoClient.connect(mongoUri, function(err, db) {
 
 app.use(logfmt.requestLogger());
 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+
+
 app.get('/', function(req, res) {
 
+	var locals = {
+        title: 'This is Oshani sample app',
+        url: gapi.url
+    };
+  	res.render('index.jade', locals);
 
-	 collection.find().toArray(function(err, items) {
-		 console.log(items.length);
-	 });
 
-	collection.findOne({mykey:1}, function(err, item) {
-	    	res.send(item);
-	});
-    });
+	// collection.findOne({mykey:1}, function(err, item) {
+	//     	res.send(item);
+	// });
+
+});
+
+app.get('/oauth2callback', function(req, res) {
+  
+  var code = req.query.code;
+  console.log(code);
+  gapi.client.getToken(code, function(err, tokens){
+    gapi.client.credentials = tokens;
+    getData();
+  });
+  
+  var locals = {
+        title: 'My sample app',
+        url: gapi.url
+      };
+  res.render('index.jade', locals);
+});
+
+var getData = function() {
+  gapi.oauth.userinfo.get().withAuthClient(gapi.client).execute(function(err, results){
+      console.log(results);
+  });
+  gapi.cal.calendarList.list().withAuthClient(gapi.client).execute(function(err, results){
+    console.log(results);
+  });
+};
 
 var port = Number(process.env.PORT || 5000);
 app.listen(port, function() {
