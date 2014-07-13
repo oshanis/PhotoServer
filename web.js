@@ -96,9 +96,6 @@ var getData = function() {
   });
   gapi.cal.calendarList.list().withAuthClient(gapi.client).execute(function(err, results){
     console.log(results);
-    for (var i = results.items.length - 1; i >= 0; i--) {
-      my_calendars.push(results.items[i].summary);
-    };
   });
 };
 
@@ -107,7 +104,6 @@ app.get('/cal', function(req, res){
     title: "These are your calendars",
     user: my_profile.name,
     bday: my_profile.birthday,
-    events: my_calendars,
     email: my_email
   };
   res.render('cal.jade', locals);
