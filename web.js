@@ -3,11 +3,7 @@ var express = require("express");
 var logfmt = require("logfmt");
 var app = express();
 
-var mongo = require('mongodb');
-
-var uristring = process.env.MONGOLAB_URI ||
-  process.env.MONGOHQ_URL ||
-  'mongodb://localhost/mydb';
+// var mongo = require('mongodb');
 
 // var mongoUri = process.env.MONGOLAB_URI ||
 //   process.env.MONGOHQ_URL ||
@@ -20,40 +16,19 @@ var uristring = process.env.MONGOLAB_URI ||
 //   });
 // });
 
-var mongoDb;
-function connectToDb(done){
-  mongo.connect(uristring, function (err, db) {
-      if (err) {
-         console.log ('ERROR connecting to: ' + uristring + '. ' + err);
-      } else {
-         console.log ('Succeeded connected to: ' + uristring);
-         mongoDb = db;
-         done();
-      }
-  });
-}
+// Retrieve
+var MongoClient = require('mongodb').MongoClient;
 
-connectToDb(function(){
-   recipesToDB(yourRecipesObject);
+var mongoUri = process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL ||
+  'mongodb://localhost:27017/exampleDb';
+
+// Connect to the db
+MongoClient.connect(mongoUri, function(err, db) {
+  if(!err) {
+    console.log("We are connected");
+  }
 });
-
-
-function recipesToDB(recipes) {
-
-
-     mongoDb.createCollection('recipes', function(err, collection) {});
-
-     var collection = mongoDb.collection('recipes');
-
-     collection.insert(recipes, {continueOnError: true}, 
-     		function(err, result) {
-	            if (err) {
-	               console.log('ERROR:' + err);
-	            } else {
-	               console.log('success');
-	            }
-     		});
-  	}
 
 app.use(logfmt.requestLogger());
 
