@@ -20,8 +20,8 @@ var express = require("express"),
 var my_profile = {},
     my_email = '';
 
-var server_url = 'http://localhost:5000/';
-//var server_url = 'http://httpa-photo-server.herokuapp.com/';
+//var server_url = 'http://localhost:5000/';
+var server_url = 'http://httpa-photo-server.herokuapp.com/';
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
