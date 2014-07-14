@@ -1,0 +1,17 @@
+extends layout
+
+block content
+	h1= title
+	table
+		thead
+			tr 
+				th Email
+				th name
+				th Date Joined
+		tbody
+			each user in users
+				tr
+					td= user._id
+					td= user.name
+					td= user.joined
+
