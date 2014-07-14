@@ -99,7 +99,7 @@ app.get('/oauth2callback', function(req, res) {
 
 var getData = function(req, res) {
   gapi.oauth.userinfo.get().withAuthClient(gapi.client).execute(function(err, results){
-      //console.log(results);
+      console.log(results.link);
       my_email = results.email;
       my_profile.name = results.name;
       
@@ -132,8 +132,8 @@ app.get('/user', function(req, res){
   };
 
   user_collection.find().toArray(function(err, items) {
-    console.log("*************");
-    console.log(items);
+    // console.log("*************");
+    // console.log(items);
 
   });
 
