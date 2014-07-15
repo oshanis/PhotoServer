@@ -18,10 +18,12 @@ var express = require("express"),
 // });
 
 var my_profile = {},
-    my_email = '';
+    my_email = '',
+    my_url = '';
 
-//var server_url = 'http://localhost:5000/';
-var server_url = 'http://httpa-photo-server.herokuapp.com/';
+//var server_url = 'http://localhost:5000';
+var server_url = 'http://httpa-photo-server.herokuapp.com';
+
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
@@ -33,6 +35,7 @@ var mongoUri = process.env.MONGOLAB_URI ||
 var collection;
 var user_collection;
 var photo_collection;
+var provenance_collection;
 
 // Connect to the db
 MongoClient.connect(mongoUri, function(err, db) {
@@ -45,6 +48,7 @@ MongoClient.connect(mongoUri, function(err, db) {
 
     //Instantiate the users table to store their data
     user_collection = db.collection('users');
+    photo_collection = db.collection('photos');
     
   	// var collection = db.collection('test');
   	// var docs = [{mykey:1}, {mykey:2}, {mykey:3}];
@@ -62,8 +66,24 @@ MongoClient.connect(mongoUri, function(err, db) {
 });
 
 app.use(logfmt.requestLogger());
+
+//Setting the usage restrictions for the images served from this website
+app.use(function(req, res, next) {
+  var matchUrl = '/';
+  if(req.url.substring(0, matchUrl.length) === matchUrl) {
+    console.log(server_url+req.url);
+    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
+       if (item){
+        res.setHeader("Usage-Restrictions", item.user);
+       }
+      });
+
+  }
+  return next();
+});
 // Use quickthumb
 app.use(qt.static(__dirname + '/'));
+
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -97,22 +117,25 @@ app.get('/oauth2callback', function(req, res) {
   
 });
 
+
 var getData = function(req, res) {
   gapi.oauth.userinfo.get().withAuthClient(gapi.client).execute(function(err, results){
       console.log(results.link);
       my_email = results.email;
       my_profile.name = results.name;
+      my_url = results.link;
       
+      //Use this to get a clean collection of the users
       //user_collection.remove(function(err, result) {});
       
       //Add their information to the database
       var current_date = new Date();
-      var user_data = [{_id:my_email, name:my_profile.name, joined: current_date}] ;
+      var user_data = [{_id:my_url, email: my_email, name:my_profile.name, joined: current_date}] ;
       user_collection.insert(user_data, {w:1}, function(err, result) {});
 
 
       //Redirect
-      res.writeHead(301, {Location: server_url+'user'});
+      res.writeHead(301, {Location: server_url+'/user'});
       res.end();
 
   });
@@ -128,16 +151,10 @@ app.get('/user', function(req, res){
     title: "Your personal info",
     user: my_profile.name,
     bday: my_profile.birthday,
-    email: my_email
+    email: my_email,
   };
 
-  user_collection.find().toArray(function(err, items) {
-    // console.log("*************");
-    // console.log(items);
-
-  });
-
-  res.render('cal.jade', locals);
+  res.render('user.jade', locals);
 });
 
 
@@ -145,7 +162,7 @@ app.get('/printusers', function(req, res){
   user_collection.find().toArray(function(err, items) {
   
     var locals = {
-      title: "Details of users",
+      title: "Signed-up Users",
       users: items
     };
 
@@ -153,6 +170,20 @@ app.get('/printusers', function(req, res){
   });
 
 });
+
+app.get('/printphotos', function(req, res){
+  photo_collection.find().toArray(function(err, items) {
+  
+    var locals = {
+      title: "Uploaded Photos",
+      photos: items
+    };
+
+    res.render('photos.jade', locals);
+  });
+
+});
+
 
 app.get('/upload', function(req, res){
 
@@ -168,6 +199,10 @@ app.get('/upload', function(req, res){
 });
 
 app.post('/upload', function (req, res){
+
+  //Housekeeping
+  //photo_collection.remove(function(err, result) {});
+ 
   var form = new formidable.IncomingForm();
   form.parse(req, function(err, fields, files) {
     res.writeHead(200, {'content-type': 'text/plain'});
@@ -181,14 +216,26 @@ app.post('/upload', function (req, res){
    /* The file name of the uploaded file */
    var file_name = this.openedFiles[0].name;
    /* Location where we want to copy the uploaded file */
-   var new_location = 'uploads/';
+   var new_location = '/uploads/';
+   var photo_url = server_url + new_location + file_name;
 
-   fs.copy(temp_path, new_location + file_name, function(err) {  
+   console.log(temp_path);
+    console.log(photo_url);
+
+    //Important: We require the 'uploads/' here because fs requires it that way!
+   fs.copy(temp_path, 'uploads/' + file_name , function(err) {  
      if (err) {
        console.error(err);
      } 
      else {
       	console.log("success!");
+
+        //add the image location to the database
+        //
+        var current_date = new Date();
+        var photo_data = [{_id:photo_url, user: my_url, uploaded: current_date}] ;
+        photo_collection.insert(photo_data, {w:1}, function(err, result) {});
+
      }
    });
   });

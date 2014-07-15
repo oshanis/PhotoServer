@@ -1,0 +1,18 @@
+extends layout
+
+block content
+	h1= title
+	table(border='1',cellpadding='10')
+		thead
+			tr 
+				th Photo
+				th Profile Page
+				th Date Uploaded
+		tbody
+			each photo in photos
+				tr
+					td
+						img(src= "#{photo._id}", width="100px") 
+					td= photo.user
+					td= photo.uploaded
+	

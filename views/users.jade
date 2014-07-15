@@ -2,16 +2,18 @@ extends layout
 
 block content
 	h1= title
-	table
+	table(border='1',cellpadding='10')
 		thead
 			tr 
-				th Email
-				th name
+				th Profile page
+				th Name
 				th Date Joined
+				th Email
 		tbody
 			each user in users
 				tr
 					td= user._id
 					td= user.name
 					td= user.joined
+					td= user.email
 
