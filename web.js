@@ -75,7 +75,8 @@ app.use(function(req, res, next) {
     console.log(server_url+req.url);
     photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
        if (item){
-        res.setHeader("Usage-Restrictions", item.user);
+        console.log("***********" + item.user);
+        //res.setHeader("Usage-Restrictions", item.user);
        }
       });
 
