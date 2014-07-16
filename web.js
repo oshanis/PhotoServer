@@ -76,17 +76,17 @@ app.use(function(req, res, next) {
     photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
        if (item){
         console.log("***********" + item.user);
-        //res.setHeader("Usage-Restrictions", item.user);
-
+        res.setHeader("Usage-Restrictions", item.user);
+        return next();
        }
     });
 
-    res.setHeader("Usage-Restrictions", "item.user");
+    //res.setHeader("Usage-Restrictions", "item.user");
 
   }
 
 
-  return next();
+//  return next();
 });
 
 // Use quickthumb
