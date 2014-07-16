@@ -111,7 +111,6 @@ app.get('/home', routes.home);
 app.get('/oauth2callback', function(req, res) {
   
   var code = req.query.code;
-  app.set('code', code);
   gapi.client.getToken(code, function(err, tokens){
     gapi.client.credentials = tokens;
     getData(req, res);
@@ -127,10 +126,11 @@ var getData = function(req, res) {
       my_profile.name = results.name;
       my_url = results.link;
 
+      //There is a bug with this when concurrent users are logged in
       app.set('user', my_url);
       
       //Use this to get a clean collection of the users
-      user_collection.remove(function(err, result) {});
+      //user_collection.remove(function(err, result) {});
       
       //Add their information to the database
       var current_date = new Date();
@@ -202,10 +202,13 @@ app.get('/upload', function(req, res){
 
 });
 
+
+
+
 app.post('/upload', function (req, res){
 
   //Housekeeping
-  photo_collection.remove(function(err, result) {});
+  //photo_collection.remove(function(err, result) {});
  
   var form = new formidable.IncomingForm();
   form.parse(req, function(err, fields, files) {
