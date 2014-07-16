@@ -98,6 +98,9 @@ app.set('view engine', 'jade');
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Setting this library so that it can be accessed in the routes
+app.set('gapi', gapi);
+
 app.get('/', routes.index);
 
 // app.get('/', function(req, res) {

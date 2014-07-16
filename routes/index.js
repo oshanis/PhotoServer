@@ -8,6 +8,8 @@ var brand = 'Bootstrap for Jade';
 exports.index = function(req, res){
 //  res.redirect('/home');
 
+	var gapi = req.app.get('gapi');
+	
 	var locals = {
         title: 'Photo Sharing App for HTTPA',
         url: gapi.url
