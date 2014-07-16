@@ -1,6 +1,9 @@
 {
   "name": "PhotoServer",
   "version": "0.0.1",
+  "engines": {
+    "node": "0.10.29"
+  },
   "description": "Photo Server for the photorm client application",
   "main": "web.js",
   "scripts": {
