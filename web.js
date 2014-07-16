@@ -69,6 +69,8 @@ MongoClient.connect(mongoUri, function(err, db) {
 app.use(logfmt.requestLogger());
 
 //Setting the usage restrictions for the images served from this website
+//Make sure to call next() only when the call to the db is complete
+//Otherwise no usage_restrictions will be set on the request
 app.use(function(req, res, next) {
   var matchUrl = '/';
   if(req.url.substring(0, matchUrl.length) === matchUrl) {
@@ -81,12 +83,8 @@ app.use(function(req, res, next) {
        return next();
     });
 
-    //res.setHeader("Usage-Restrictions", "item.user");
-
   }
 
-
-//  return next();
 });
 
 // Use quickthumb
