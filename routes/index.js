@@ -13,7 +13,8 @@ exports.index = function(req, res){
         url: gapi.url,
         id: 'home', 
         brand: brand,
-        authenticated:  (req.app.get('code') != undefined)
+        authenticated:  (req.app.get('code') != undefined),
+        user: eq.app.get('user')
     };
     console.log("***********"+locals.authenticated);
   	res.render('index', locals);

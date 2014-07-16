@@ -1,10 +1,10 @@
 extends layout
 block content
-	p Welcome to #{title}
+	h1 Welcome to #{title}
 	if (authenticated != true) 
-		a(href= url)= "Get Permissions"
+		a(href= url)= "Please login with your Google Plus Profile"
 	else
-		p Already authenticated
+		p You are logged in as #{user}
 	br
 
 	form(name="input", action="/upload", enctype="multipart/form-data", method="post")

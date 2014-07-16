@@ -126,6 +126,8 @@ var getData = function(req, res) {
       my_email = results.email;
       my_profile.name = results.name;
       my_url = results.link;
+
+      app.set('user', my_url);
       
       //Use this to get a clean collection of the users
       user_collection.remove(function(err, result) {});
