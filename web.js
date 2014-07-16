@@ -103,15 +103,6 @@ app.set('gapi', gapi);
 
 app.get('/', routes.index);
 
-// app.get('/', function(req, res) {
-
-//   var locals = {
-//         title: 'Photo Sharing App for HTTPA',
-//         url: gapi.url
-//     };
-//     res.render('index.jade', locals);
-// });
-
 app.get('/home', routes.home);
 
 //After the user is authenticated by Google, redirect to the page displaying their 
