@@ -73,17 +73,21 @@ app.use(function(req, res, next) {
   var matchUrl = '/';
   if(req.url.substring(0, matchUrl.length) === matchUrl) {
     console.log(server_url+req.url);
-    var result = photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
+    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
        if (item){
         console.log("***********" + item.user);
         //res.setHeader("Usage-Restrictions", item.user);
+
        }
       });
-    console.log("@@@@@@@@" + result);
 
   }
+
+  res.setHeader("Usage-Restrictions", "item.user");
+
   return next();
 });
+
 // Use quickthumb
 app.use(qt.static(__dirname + '/'));
 
