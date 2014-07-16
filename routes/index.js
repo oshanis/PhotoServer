@@ -1,5 +1,5 @@
 
-var brand = 'HTTPA Demo: PhotoRM | Decentralized Information Group, MIT';
+var brand = 'HTTPA Demo: PhotoRM';
 
 exports.index = function(req, res){
 
