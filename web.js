@@ -77,8 +77,8 @@ app.use(function(req, res, next) {
        if (item){
         console.log("***********" + item.user);
         res.setHeader("Usage-Restrictions", item.user);
-        return next();
        }
+       return next();
     });
 
     //res.setHeader("Usage-Restrictions", "item.user");
