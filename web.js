@@ -111,6 +111,7 @@ app.get('/home', routes.home);
 app.get('/oauth2callback', function(req, res) {
   
   var code = req.query.code;
+  app.set('code', code);
   gapi.client.getToken(code, function(err, tokens){
     gapi.client.credentials = tokens;
     getData(req, res);
@@ -201,9 +202,6 @@ app.get('/upload', function(req, res){
   res.render('upload.jade', locals);
 
 });
-
-
-
 
 app.post('/upload', function (req, res){
 
