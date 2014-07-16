@@ -7,9 +7,11 @@ exports.index = function(req, res){
 
 	var locals = {
         title: 'Photo Sharing App for HTTPA',
-        url: gapi.url
+        url: gapi.url,
+        id: 'home', 
+        brand: brand 
     };
-  	res.render('index.jade', locals);
+  	res.render('index', locals);
 
 }
 
