@@ -103,6 +103,7 @@ app.set('gapi', gapi);
 
 app.get('/', routes.index);
 
+
 app.get('/home', routes.home);
 
 //After the user is authenticated by Google, redirect to the page displaying their 
