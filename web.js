@@ -97,7 +97,6 @@ app.set('view engine', 'jade');
 
 app.use(app.router);
 
-localStorage
 app.get('/', function(req, res) {
 
 	var locals = {
