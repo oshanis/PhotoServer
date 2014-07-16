@@ -9,7 +9,125 @@ var express = require("express"),
     formidable = require('formidable'),
     util = require('util')
     fs   = require('fs-extra'),
-    qt   = require('quickthumb');
+    qt   = require('quickthumb'),
+    passport = require('passport'),
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+
+// var GOOGLE_CLIENT_ID = '736056096064-o2b4h5ttm6g3u0emscle1vmemcbihebb.apps.googleusercontent.com',
+//     GOOGLE_CLIENT_SECRET = 'UnO6RMVMc755ZVNg92ivRzRM',
+//     GOOGLE_CALLBACK_URL = 'http://localhost:5000/oauth2callback';
+
+var GOOGLE_CLIENT_ID = '736056096064-4qsbj6uvec0am09ocijnvfo6akic5tqo.apps.googleusercontent.com',
+    GOOGLE_CLIENT_SECRET =  'RIy7_V7jvVycIeUWRBoyi0Iw',
+    GOOGLE_CALLBACK_URL = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com/oauth2callback',
+
+//var server_url = 'http://localhost:5000';
+//var server_url = 'http://httpa-photo-server.herokuapp.com';
+var server_url = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com';
+
+
+// Passport session setup.
+//   To support persistent login sessions, Passport needs to be able to
+//   serialize users into and deserialize users out of the session.  Typically,
+//   this will be as simple as storing the user ID when serializing, and finding
+//   the user by ID when deserializing.  However, since this example does not
+//   have a database of user records, the complete Google profile is
+//   serialized and deserialized.
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+
+// Use the GoogleStrategy within Passport.
+//   Strategies in Passport require a `verify` function, which accept
+//   credentials (in this case, an accessToken, refreshToken, and Google
+//   profile), and invoke a callback with a user object.
+passport.use(new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: GOOGLE_CALLBACK_URL
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      
+      // To keep the example simple, the user's Google profile is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the Google account with a user record in your database,
+      // and return that user instead.
+      return done(null, profile);
+    });
+  }
+));
+
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+
+
+app.use(logfmt.requestLogger());
+app.use(qt.static(__dirname + '/')); // Use quickthumb
+app.use(express.logger());
+app.use(express.cookieParser());
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+app.use(express.session({ secret: 'keyboard cat' }));
+// Initialize Passport!  Also use passport.session() middleware, to support
+// persistent login sessions (recommended).
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
+
+//Setting the usage restrictions for the images served from this website
+//Make sure to call next() only when the call to the db is complete
+//Otherwise no usage_restrictions will be set on the request
+app.use(function(req, res, next) {
+  var matchUrl = '/';
+  if(req.url.substring(0, matchUrl.length) === matchUrl) {
+    console.log(server_url+req.url);
+    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
+       if (item){
+        console.log("***********" + item.user);
+        res.setHeader("Usage-Restrictions", item.user);
+       }
+       return next();
+    });
+
+  }
+
+});
+
+
+app.get('/', routes.index);
+
+app.get('/account', ensureAuthenticated, routes.account);
+
+
+// GET /auth/google
+//   Use passport.authenticate() as route middleware to authenticate the
+//   request.  The first step in Google authentication will involve
+//   redirecting the user to google.com.  After authorization, Google
+//   will redirect the user back to this application at /auth/google/callback
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/userinfo.profile',
+                                            'https://www.googleapis.com/auth/userinfo.email'] }),
+  function(req, res){
+    // The request will be redirected to Google for authentication, so this
+    // function will not be called.
+  });
+
+
+app.get('/oauth2callback', 
+  passport.authenticate('google', { failureRedirect: '/' }),
+  function(req, res) {
+    // Successful authentication, redirect to account.
+    res.redirect('/account');
+});
 
 // mongo.Db.connect(mongoUri, function (err, db) {
 //   db.collection('mydocs', function(er, collection) {
@@ -22,9 +140,6 @@ var my_profile = {},
     my_email = '',
     my_url = '';
 
-//var server_url = 'http://localhost:5000';
-//var server_url = 'http://httpa-photo-server.herokuapp.com';
-var server_url = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com';
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
@@ -67,57 +182,25 @@ MongoClient.connect(mongoUri, function(err, db) {
 
 });
 
-app.use(logfmt.requestLogger());
-
-//Setting the usage restrictions for the images served from this website
-//Make sure to call next() only when the call to the db is complete
-//Otherwise no usage_restrictions will be set on the request
-app.use(function(req, res, next) {
-  var matchUrl = '/';
-  if(req.url.substring(0, matchUrl.length) === matchUrl) {
-    console.log(server_url+req.url);
-    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
-       if (item){
-        console.log("***********" + item.user);
-        res.setHeader("Usage-Restrictions", item.user);
-       }
-       return next();
-    });
-
-  }
-
-});
-
-// Use quickthumb
-app.use(qt.static(__dirname + '/'));
-
-
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-
-app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
 
 //Setting this library so that it can be accessed in the routes
-app.set('gapi', gapi);
+//app.set('gapi', gapi);
 
-app.get('/', routes.index);
 
 
 app.get('/home', routes.home);
 
 //After the user is authenticated by Google, redirect to the page displaying their 
 //personal information
-app.get('/oauth2callback', function(req, res) {
+// app.get('/oauth2callback', function(req, res) {
   
-  var code = req.query.code;
-  app.set('code', code);
-  gapi.client.getToken(code, function(err, tokens){
-    gapi.client.credentials = tokens;
-    getData(req, res);
-  });
+//   var code = req.query.code;
+//   gapi.client.getToken(code, function(err, tokens){
+//     gapi.client.credentials = tokens;
+//     getData(req, res);
+//   });
   
-});
+// });
 
 
 var getData = function(req, res) {
@@ -128,7 +211,7 @@ var getData = function(req, res) {
       my_url = results.link;
 
       //There is a bug with this when concurrent users are logged in
-      app.set('user', my_url);
+      //app.set('user', my_url);
       
       //Use this to get a clean collection of the users
       //user_collection.remove(function(err, result) {});
@@ -144,10 +227,6 @@ var getData = function(req, res) {
       res.end();
 
   });
-  gapi.cal.calendarList.list().withAuthClient(gapi.client).execute(function(err, results){
-    console.log(results);
-  });
-
 
 };
 
@@ -248,7 +327,17 @@ app.post('/upload', function (req, res){
 
 
 
-var port = Number(process.env.PORT || 8080);
+var port = Number(process.env.PORT || 5000);
 app.listen(port, function() {
 	console.log("Listening on " + port);
     });
+
+// Simple route middleware to ensure user is authenticated.
+//   Use this route middleware on any resource that needs to be protected.  If
+//   the request is authenticated (typically via a persistent login session),
+//   the request will proceed.  Otherwise, the user will be redirected to the
+//   login page.
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/');
+}

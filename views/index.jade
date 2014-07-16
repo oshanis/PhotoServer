@@ -3,8 +3,9 @@ block content
 	h1 Welcome to #{title}
 	h4 #{subtitle}
 	br
-	if (authenticated != true) 
-		a(href= url)= "Please login with your Google Plus Profile"
+	if (user == undefined) 
+		a(href= "/auth/google")= "Please login with your Google Plus Profile"
 	else
-		p You are logged in as #{user}
+		p You are logged in as 
+			a(href= user._json.link) #{user.displayName}
 	br

@@ -17,14 +17,15 @@ curl --form upload=@close.png --form press=OK localhost:5000/upload
 
 Authentication is provided by OAuth
 ====================================
-This client library was used in the implementation:
+Decided to use Passport http://passportjs.org/
+with passport-google-oauth: https://github.com/jaredhanson/passport-google-oauth/
+
+[[This client library was used in the implementation:
 https://github.com/google/google-api-nodejs-client/
 
 More information on using Google Oauth and Node.js:
 http://javascriptplayground.com/blog/2013/06/node-and-google-oauth/
-
-Although not used in this implementation, special attention should be given to the passport.js node module available at:
-http://passportjs.org/
+]]
 
 
 Image File Upload From form on the index page tested

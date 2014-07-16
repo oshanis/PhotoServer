@@ -1,26 +1,30 @@
 
 var brand = 'PhotoRM';
 
+
 exports.index = function(req, res){
 
 	var gapi = req.app.get('gapi');
 
 	var url ;
 
-	
 	var locals = {
         title: 'PhotoRM',
         subtitle: 'A Photo Sharing App to demonstrate HTTPA',
-        url: gapi.url,
         id: 'home', 
         brand: brand,
-        authenticated:  (req.app.get('code') != undefined),
-        user: req.app.get('user')
+        user: req.user
     };
-    console.log("***********"+locals.authenticated);
   	res.render('index', locals);
 
-}
+};
+
+exports.account = function(req, res){
+  var locals = { 
+    user: req.user 
+  };
+  res.render('account', locals);
+};
 
 exports.home = function(req, res){
   res.render('home', { title: 'Upload Photo', id: 'home', brand: brand })
