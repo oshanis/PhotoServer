@@ -79,11 +79,12 @@ app.use(function(req, res, next) {
         //res.setHeader("Usage-Restrictions", item.user);
 
        }
-      });
+    });
+
+    res.setHeader("Usage-Restrictions", "item.user");
 
   }
 
-  res.setHeader("Usage-Restrictions", "item.user");
 
   return next();
 });
