@@ -13,7 +13,7 @@ html
               span.icon-bar
               span.icon-bar
               span.icon-bar
-            a.navbar-brand(href='#') #{brand}
+            a.navbar-brand(href='/') #{brand}
           .navbar-collapse.collapse
             ul.nav.navbar-nav
               - var obj = { 'home':'Home', 'about':'About' }
@@ -24,6 +24,7 @@ html
                   - else            
                     li
                       a(href='#{key}') #{val}
+              p test
     div.container
         div.jumbotron
 
