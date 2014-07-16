@@ -127,7 +127,7 @@ var getData = function(req, res) {
       my_url = results.link;
       
       //Use this to get a clean collection of the users
-      //user_collection.remove(function(err, result) {});
+      user_collection.remove(function(err, result) {});
       
       //Add their information to the database
       var current_date = new Date();
@@ -202,7 +202,7 @@ app.get('/upload', function(req, res){
 app.post('/upload', function (req, res){
 
   //Housekeeping
-  //photo_collection.remove(function(err, result) {});
+  photo_collection.remove(function(err, result) {});
  
   var form = new formidable.IncomingForm();
   form.parse(req, function(err, fields, files) {
