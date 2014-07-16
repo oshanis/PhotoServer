@@ -14,7 +14,7 @@ exports.index = function(req, res){
         id: 'home', 
         brand: brand,
         authenticated:  (req.app.get('code') != undefined),
-        user: eq.app.get('user')
+        user: req.app.get('user')
     };
     console.log("***********"+locals.authenticated);
   	res.render('index', locals);
