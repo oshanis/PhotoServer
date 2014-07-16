@@ -98,20 +98,16 @@ app.set('view engine', 'jade');
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', function(req, res) {
+app.get('/', routes.index);
 
-	var locals = {
-        title: 'Photo Sharing App for HTTPA',
-        url: gapi.url
-    };
-  	res.render('index.jade', locals);
+// app.get('/', function(req, res) {
 
-
-	// collection.findOne({mykey:1}, function(err, item) {
-	//     	res.send(item);
-	// });
-
-});
+//   var locals = {
+//         title: 'Photo Sharing App for HTTPA',
+//         url: gapi.url
+//     };
+//     res.render('index.jade', locals);
+// });
 
 app.get('/home', routes.home);
 
