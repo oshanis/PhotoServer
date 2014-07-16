@@ -1,7 +1,7 @@
 extends layout
 block content
 	p Welcome to #{title}
-	if authenticated 
+	if authenticated != true 
 		a(href= url)= "Get Permissions"
 	else
 		p Already authenticated
