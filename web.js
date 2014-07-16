@@ -111,7 +111,7 @@ app.get('/home', routes.home);
 app.get('/oauth2callback', function(req, res) {
   
   var code = req.query.code;
-  console.log(code);
+  app.set('code', code);
   gapi.client.getToken(code, function(err, tokens){
     gapi.client.credentials = tokens;
     getData(req, res);

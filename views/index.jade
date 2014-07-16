@@ -1,8 +1,10 @@
 extends layout
 block content
 	p Welcome to #{title}
-	h1= title
-	a(href= url)= "Get Permissions"
+	if authenticated != undefined 
+		a(href= url)= "Get Permissions"
+	else
+		p Already authenticated
 	br
 
 	form(name="input", action="/upload", enctype="multipart/form-data", method="post")

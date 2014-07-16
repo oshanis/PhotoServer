@@ -1,15 +1,19 @@
 
-var brand = 'HTTPA Demo: PhotoRM';
+var brand = 'PhotoRM';
 
 exports.index = function(req, res){
 
 	var gapi = req.app.get('gapi');
 
+	var url ;
+
+	
 	var locals = {
-        title: 'Photo Sharing App for HTTPA',
+        title: 'PhotoRM: A Photo Sharing App to demonstrate HTTPA',
         url: gapi.url,
         id: 'home', 
-        brand: brand 
+        brand: brand,
+        authenticated:  (req.app.get('code') != undefined)
     };
   	res.render('index', locals);
 
