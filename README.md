@@ -1,3 +1,9 @@
+Debugging with one single entry
+=============================
+Make sure to comment the line with *_collection.remove when deploying.
+This is only for debugging
+
+
 Deploying to Heroku
 ====================
 web.js: Remember to change the server_url line
