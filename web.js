@@ -30,7 +30,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
-  'mongodb://localhost:27017/exampleDb',
+  'mongodb://localhost:27017/exampleDb' ||
   'mongodb://ec2-54-186-231-154.us-west-2.compute.amazonaws.com:27017/exampleDb';
 
 var collection;
