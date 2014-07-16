@@ -1,13 +1,11 @@
 extends layout
 block content
-	div.container
-		div.jumbotron
-			h1= title
-			p Welcome to #{title}
-			h1= title
-			a(href= url)= "Get Permissions"
-			br
+	h1= title
+	p Welcome to #{title}
+	h1= title
+	a(href= url)= "Get Permissions"
+	br
 
-			form(name="input", action="/upload", enctype="multipart/form-data", method="post")
-				input(type="file", name="upload", multiple="multiple")
-				input(type="submit", value="Upload")
+	form(name="input", action="/upload", enctype="multipart/form-data", method="post")
+		input(type="file", name="upload", multiple="multiple")
+		input(type="submit", value="Upload")
