@@ -96,6 +96,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 
 app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function(req, res) {
 
@@ -111,6 +112,8 @@ app.get('/', function(req, res) {
 	// });
 
 });
+
+app.get('/home', routes.home);
 
 //After the user is authenticated by Google, redirect to the page displaying their 
 //personal information
