@@ -9,7 +9,8 @@ exports.index = function(req, res){
 
 	
 	var locals = {
-        title: 'PhotoRM: A Photo Sharing App to demonstrate HTTPA',
+        title: 'PhotoRM',
+        subtitle: 'A Photo Sharing App to demonstrate HTTPA',
         url: gapi.url,
         id: 'home', 
         brand: brand,
@@ -22,7 +23,7 @@ exports.index = function(req, res){
 }
 
 exports.home = function(req, res){
-  res.render('home', { title: 'Home', id: 'home', brand: brand })
+  res.render('home', { title: 'Upload Photo', id: 'home', brand: brand })
 };
 
 exports.about = function(req, res){
