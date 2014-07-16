@@ -4,6 +4,7 @@ var express = require("express"),
     http = require('http'),
     path = require('path'),
     gapi = require('./lib/gapi'),
+    routes = require('./routes'),
 	  logfmt = require("logfmt"),
     formidable = require('formidable'),
     util = require('util')
@@ -93,6 +94,8 @@ app.use(qt.static(__dirname + '/'));
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
+
+app.use(app.router);
 
 
 app.get('/', function(req, res) {
