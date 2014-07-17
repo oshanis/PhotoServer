@@ -1,0 +1,27 @@
+{
+   "provider":"google",
+   "id":"104888544551171873513",
+   "displayName":"Oshani Seneviratne",
+   "name":{
+      "familyName":"Seneviratne",
+      "givenName":"Oshani"
+   },
+   "emails":[
+      {
+         "value":"oshanis@gmail.com"
+      }
+   ],
+   "_raw":"{\n \"id\": \"104888544551171873513\",\n \"email\": \"oshanis@gmail.com\",\n \"verified_email\": true,\n \"name\": \"Oshani Seneviratne\",\n \"given_name\": \"Oshani\",\n \"family_name\": \"Seneviratne\",\n \"link\": \"https://plus.google.com/+OshaniSeneviratne\",\n \"picture\": \"https://lh4.googleusercontent.com/-97nGF2H_PYU/AAAAAAAAAAI/AAAAAAAAAAA/0Hk45DD3J5A/photo.jpg\",\n \"gender\": \"female\",\n \"locale\": \"en\"\n}\n",
+   "_json":{
+      "id":"104888544551171873513",
+      "email":"oshanis@gmail.com",
+      "verified_email":true,
+      "name":"Oshani Seneviratne",
+      "given_name":"Oshani",
+      "family_name":"Seneviratne",
+      "link":"https://plus.google.com/+OshaniSeneviratne",
+      "picture":"https://lh4.googleusercontent.com/-97nGF2H_PYU/AAAAAAAAAAI/AAAAAAAAAAA/0Hk45DD3J5A/photo.jpg",
+      "gender":"female",
+      "locale":"en"
+   }
+}

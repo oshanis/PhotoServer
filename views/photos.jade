@@ -6,13 +6,17 @@ block content
 		thead
 			tr 
 				th Photo
-				th Profile Page
+				th User
+				th Usage Restrictions
 				th Date Uploaded
 		tbody
 			each photo in photos
 				tr
 					td
-						img(src= "#{photo._id}", width="100px") 
-					td= photo.user
+						a(href= photo._id)
+							img(src= "#{photo._id}", width="100px") 
+					td
+						a(href= photo.user)  #{photo.username}
+					td= photo.usage_restrictions
 					td= photo.uploaded
 	

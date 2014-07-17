@@ -1,10 +1,6 @@
-
 var brand = 'PhotoRM';
 
-
 exports.index = function(req, res){
-
-	var gapi = req.app.get('gapi');
 
 	var url ;
 
@@ -21,15 +17,9 @@ exports.index = function(req, res){
 
 exports.account = function(req, res){
   var locals = { 
-    user: req.user 
+    user: req.user,
+    brand: brand 
   };
   res.render('account', locals);
 };
 
-exports.home = function(req, res){
-  res.render('home', { title: 'Upload Photo', id: 'home', brand: brand })
-};
-
-exports.about = function(req, res){
-  res.render('about', { title: 'About', id: 'about', brand: brand })
-};
