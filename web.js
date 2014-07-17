@@ -19,7 +19,7 @@ var express = require("express"),
 
 var GOOGLE_CLIENT_ID = '736056096064-4qsbj6uvec0am09ocijnvfo6akic5tqo.apps.googleusercontent.com',
     GOOGLE_CLIENT_SECRET =  'RIy7_V7jvVycIeUWRBoyi0Iw',
-    GOOGLE_CALLBACK_URL = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com/oauth2callback',
+    GOOGLE_CALLBACK_URL = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com/oauth2callback';
 
 //var server_url = 'http://localhost:5000';
 //var server_url = 'http://httpa-photo-server.herokuapp.com';
