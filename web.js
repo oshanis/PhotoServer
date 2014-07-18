@@ -10,26 +10,27 @@ var express = require("express"),
     fs   = require('fs'),
     qt   = require('quickthumb'),
     passport = require('passport'),
-    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+    randomstring = require("randomstring");
 
 
-// var GOOGLE_CLIENT_ID = '736056096064-o2b4h5ttm6g3u0emscle1vmemcbihebb.apps.googleusercontent.com',
-//     GOOGLE_CLIENT_SECRET = 'UnO6RMVMc755ZVNg92ivRzRM',
-//     GOOGLE_CALLBACK_URL = 'http://localhost:8080/oauth2callback';
+var GOOGLE_CLIENT_ID = '736056096064-o2b4h5ttm6g3u0emscle1vmemcbihebb.apps.googleusercontent.com',
+    GOOGLE_CLIENT_SECRET = 'UnO6RMVMc755ZVNg92ivRzRM',
+    GOOGLE_CALLBACK_URL = 'http://localhost:8080/oauth2callback';
 
 // var GOOGLE_CLIENT_ID = '736056096064-4qsbj6uvec0am09ocijnvfo6akic5tqo.apps.googleusercontent.com',
 //     GOOGLE_CLIENT_SECRET =  'RIy7_V7jvVycIeUWRBoyi0Iw',
 //     GOOGLE_CALLBACK_URL = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com/oauth2callback';
 
-var GOOGLE_CLIENT_ID = '736056096064-4qsbj6uvec0am09ocijnvfo6akic5tqo.apps.googleusercontent.com',
-    GOOGLE_CLIENT_SECRET =  'RIy7_V7jvVycIeUWRBoyi0Iw',
-    GOOGLE_CALLBACK_URL = 'http://imagehare.com/oauth2callback';
+// var GOOGLE_CLIENT_ID = '736056096064-4qsbj6uvec0am09ocijnvfo6akic5tqo.apps.googleusercontent.com',
+//     GOOGLE_CLIENT_SECRET =  'RIy7_V7jvVycIeUWRBoyi0Iw',
+//     GOOGLE_CALLBACK_URL = 'http://imagehare.com/oauth2callback';
 
 
 
-//var server_url = 'http://localhost:8080';
+var server_url = 'http://localhost:8080';
 //var server_url = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com';
-var server_url = 'http://imagehare.com';
+//var server_url = 'http://imagehare.com';
 
 
 //Setting the usage restrictions for the images served from this website
@@ -224,7 +225,8 @@ app.get('/myphotos',
         ensureAuthenticated, 
         function(req, res){
           //console.log(req.user._json.link);
-          photo_collection.find({'user': req.user._json.link}).toArray(function(err, items) {
+          var user = (req.user == undefined) ? req.headers['user'] : req.user._json.link;
+          photo_collection.find({'user': user}).toArray(function(err, items) {
             console.log(JSON.stringify(items));
             var locals = {
               title: "Uploaded Photos",
@@ -241,9 +243,26 @@ app.post('/upload', ensureAuthenticated, function (req, res){
 
     //This works only if one file is uploaded at a time
     var file_name=req.files.upload.originalFilename;
+    
+    //For uploads from the chrome extension
+    if (file_name == 'blob'){
+      file_name = randomstring.generate(8) + '.png';
+    }
+
+    //todo: check to see if this file already exists
+    // var file = photo_collection.find({_id: server_url+'/upload/' + file_name }, {_id: 1}).limit(1);
+    // console.log(file);
+
+    // while (fileNameExists(file_name)){ 
+    //   file_name = randomstring.generate(8) + '.png';
+    // }
+    
+
+
     var path = req.files.upload.path;
     var size = req.files.upload.size;
-    var usage_restrictions = req.body.usage_restrictions; //let's assume there's only one
+    
+    //var usage_restrictions = req.body.usage_restrictions; //let's assume there's only one
 
     // if ((typeof usage_restrictions) == "string"){
     //   usage_restrictions.push(req.body.usage_restrictions);
@@ -257,19 +276,26 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     fs.rename(path, './uploads/' + file_name, function(e) {
     
       // Do what ever else you need to do.
-      res.send('File '+ file_name + 'of size '+ size + ' bytes uploaded!');
+      res.send('File '+ file_name + ' of size '+ size + ' bytes uploaded!');
       
       //Housekeeping
-      //photo_collection.remove(function(err, result) {});
+      photo_collection.remove(function(err, result) {});
 
       //add the image location to the database
       var current_date = new Date();
+      
       var photo_data = [{
                           _id:      server_url + '/uploads/' + file_name, 
-                          user:     req.user._json.link,
-                          username: req.user.displayName,
+                          user:     (req.user == undefined) ? 
+                                        req.headers['user_uri'] : 
+                                        req.user._json.link ,
+                          username: (req.user == undefined) ? 
+                                        req.headers['user_name'] : 
+                                        req.user.displayName,
                           uploaded: current_date,
-                          usage_restrictions: usage_restrictions
+                          usage_restrictions: (req.body.usage_restrictions == undefined) ? 
+                                                  req.headers['usage_restrictions'] : 
+                                                  req.body.usage_restrictions,
                         }];
 
       photo_collection.insert(photo_data, {w:1}, function(err, result) {});
@@ -291,8 +317,18 @@ app.listen(port, function() {
 //   the request will proceed.  Otherwise, the user will be redirected to the
 //   login page.
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/');
+
+  console.log(req.user);
+  //the req.isAuthenticated comes from passport.js
+  //in addition we are checking if the client sends a user header, they may also be authenticated 
+  //with Google
+  if (req.isAuthenticated() || req.headers['user_uri'] != undefined ) { return next(); }
+  if (req.headers['extension'] == 'true'){
+    res.send(server_url);
+  }
+  else{
+      res.redirect('/');
+  }
 }
 
 module.exports = app;

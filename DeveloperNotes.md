@@ -12,8 +12,8 @@ lib/gapi.js: change the client, secret and redirect
 
 Unauthenticated Request from a client
 =======================================
-curl --form upload=@close.png --form press=OK localhost:5000/upload
-
+Make note of the headers that need to be set from the client.
+ curl --form upload=@goto.png --form press=OK --header "user_uri: https://plus.google.com/+OshaniSeneviratne" --header "user_name: Oshani Seneviratne" --header "usage_restrictions: http://usage_restrictions" localhost:8080/upload
 
 
 Authentication is provided by OAuth
