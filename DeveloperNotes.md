@@ -43,7 +43,11 @@ http://tonyspiro.com/uploading-resizing-images-fly-node-js-express/
 
 Amazon EC2 Setup
 =================
-The Amazon Instance is available at: http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com/
+The ImageHare.com Amazon Instance is available at: http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com/
+The PhotoRM.org Amazon Instance is available at: 
+
+How to set up port forwarding etc on the Amazon EC2 instance
+http://www.lauradhamilton.com/how-to-set-up-a-nodejs-web-server-on-amazon-ec2
 
 Here is an example of developing a node js app with amazon ec2 and mongodb
 http://thefloppydisk.wordpress.com/2013/04/25/a-node-js-application-on-amazon-cloud-part-3-a-simple-webserver-in-javascript-using-node-express-and-mongodb/

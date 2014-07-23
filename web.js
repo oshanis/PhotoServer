@@ -14,9 +14,9 @@ var express = require("express"),
     randomstring = require("randomstring");
 
 
-var GOOGLE_CLIENT_ID = '736056096064-o2b4h5ttm6g3u0emscle1vmemcbihebb.apps.googleusercontent.com',
-    GOOGLE_CLIENT_SECRET = 'UnO6RMVMc755ZVNg92ivRzRM',
-    GOOGLE_CALLBACK_URL = 'http://localhost:8080/oauth2callback';
+// var GOOGLE_CLIENT_ID = '736056096064-o2b4h5ttm6g3u0emscle1vmemcbihebb.apps.googleusercontent.com',
+//     GOOGLE_CLIENT_SECRET = 'UnO6RMVMc755ZVNg92ivRzRM',
+//     GOOGLE_CALLBACK_URL = 'http://localhost:8080/oauth2callback';
 
 // var GOOGLE_CLIENT_ID = '736056096064-4qsbj6uvec0am09ocijnvfo6akic5tqo.apps.googleusercontent.com',
 //     GOOGLE_CLIENT_SECRET =  'RIy7_V7jvVycIeUWRBoyi0Iw',
@@ -26,11 +26,15 @@ var GOOGLE_CLIENT_ID = '736056096064-o2b4h5ttm6g3u0emscle1vmemcbihebb.apps.googl
 //     GOOGLE_CLIENT_SECRET =  'RIy7_V7jvVycIeUWRBoyi0Iw',
 //     GOOGLE_CALLBACK_URL = 'http://imagehare.com/oauth2callback';
 
+var GOOGLE_CLIENT_ID = '736056096064-itnm6v49nh39p1fjd9kd72rjiuhlt3fc.apps.googleusercontent.com',
+    GOOGLE_CLIENT_SECRET = '-R7jxH936KmPrYa3JIX1jdFA',
+    GOOGLE_CALLBACK_URL = 'http://photorm.org/oauth2callback';
 
 
-var server_url = 'http://localhost:8080';
+//var server_url = 'http://localhost:8080';
 //var server_url = 'http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com';
 //var server_url = 'http://imagehare.com';
+var server_url = 'http://photorm.org';
 
 
 //Setting the usage restrictions for the images served from this website
@@ -275,7 +279,10 @@ app.post('/upload', ensureAuthenticated, function (req, res){
 
     fs.rename(path, './uploads/' + file_name, function(e) {
     
+
       // Do what ever else you need to do.
+      res.setHeader("upload-complete", "true");
+
       res.send('File '+ file_name + ' of size '+ size + ' bytes uploaded!');
       
       //Housekeeping
