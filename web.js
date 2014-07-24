@@ -277,9 +277,10 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     
     // console.log(usage_restrictions.length);
 
-    fs.rename(path, './uploads/' + file_name, function(e) {
+//    fs.rename(path, './uploads/' + file_name, function(e) {
+    fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
     
-
+ 
       // Do what ever else you need to do.
       res.setHeader("upload-complete", "true");
 
