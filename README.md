@@ -3,6 +3,7 @@ PhotoRM
 An Accountable System Implementation for HTTPA
 
 The system can be tried out at:
-http://54.186.231.154/
+http://imagehare.com
 or
-imagehare.com
+http://photorm.com
+

@@ -1,11 +1,13 @@
-var brand = 'PhotoRM';
+var config = require('../config');
+
+var brand = config.brand;
 
 exports.index = function(req, res){
 
 	var url ;
 
 	var locals = {
-        title: 'PhotoRM',
+        title: brand,
         subtitle: 'A Photo Sharing App to demonstrate HTTPA',
         id: 'home', 
         brand: brand,

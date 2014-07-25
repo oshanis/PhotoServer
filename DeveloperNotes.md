@@ -1,3 +1,18 @@
+Config File
+===========
+In config.js export the following values that are obtained from the Google OAuth API console:
+GOOGLE_CLIENT_ID 
+GOOGLE_CLIENT_SECRET
+GOOGLE_CALLBACK_URL
+server_url
+brand
+
+e.g.
+exports.server_url = "http://localhost:8080"
+exports.brand = "localhost"
+
+
+
 Debugging with one single entry
 =============================
 Make sure to comment the line with *_collection.remove when deploying.
@@ -44,7 +59,11 @@ http://tonyspiro.com/uploading-resizing-images-fly-node-js-express/
 Amazon EC2 Setup
 =================
 The ImageHare.com Amazon Instance is available at: http://ec2-54-186-231-154.us-west-2.compute.amazonaws.com/
+ssh ~/.ssh/aws.pem ubuntu@ec2-54-186-231-154
+
 The PhotoRM.org Amazon Instance is available at: 
+54.191.197.50
+ssh ~/.ssh/aws.pem ubuntu@54.191.197.50
 
 How to set up port forwarding etc on the Amazon EC2 instance
 http://www.lauradhamilton.com/how-to-set-up-a-nodejs-web-server-on-amazon-ec2
@@ -55,6 +74,7 @@ http://thefloppydisk.wordpress.com/2013/04/25/a-node-js-application-on-amazon-cl
 Instructions on setting up mongodb on Amazon EC2
 http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
+
 Mongodb on Mac
 ==============
 Followed instructions from this (from step 3) for installing
@@ -63,4 +83,11 @@ http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/
 To run:
 cd /usr/local/mongodb/bin
 ./mongod
+
+Potential Errors that you may run into when deploying the app
+==============================================================
+" Error: ENOENT, open <file path>"
+This is because the "uploads" folder does not exist
+
+
 

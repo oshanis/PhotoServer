@@ -1,18 +1,21 @@
 extends layout
 
 block content
-	form(name="input", action="/upload", enctype="multipart/form-data", method="post", role="form-horizontal")
-		div(class="form-group")
-			label(for="inputfile", class="col-sm2") #{title}:
-			input(class="btn col-sm10" id="inputfile", type="file", name="upload", multiple="multiple")
-			p(class="help-block") (Max size 500KB)
-		div(class="form-group")
-			label(for="usage_restrictions", class="col-sm2") Set Usage Restrictions :
-			div(class="col-sm10")
-				select(multiple, class="form-control", name="usage_restrictions", id="usage_restrictions")
-					option(value="http://no-modifications") No modification
-					option(value="http://no-sharing") No sharing
-					option(value="http://no-commercial-uses") No commercial uses 
-					option(value="http://no-text-additions") No text additions
-					option(value="http://no-downloading") No downloading
-		input(class="btn btn-primary", type="submit", value="Upload")
+	if message
+		p #{message}
+	else
+		form(name="input", action="/upload", enctype="multipart/form-data", method="post", role="form-horizontal")
+			div(class="form-group")
+				label(for="inputfile", class="col-sm2") #{title}:
+				input(class="btn col-sm10" id="inputfile", type="file", name="upload", multiple="multiple")
+				p(class="help-block") (Max size 500KB)
+			div(class="form-group")
+				label(for="usage_restrictions", class="col-sm2") Set Usage Restrictions :
+				div(class="col-sm10")
+					select(multiple, class="form-control", name="usage_restrictions", id="usage_restrictions")
+						option(value="http://no-modifications") No modification
+						option(value="http://no-sharing") No sharing
+						option(value="http://no-commercial-uses") No commercial uses 
+						option(value="http://no-text-additions") No text additions
+						option(value="http://no-downloading") No downloading
+			input(class="btn btn-primary", type="submit", value="Upload")
