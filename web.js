@@ -229,6 +229,8 @@ app.get('/myphotos',
 
 app.post('/upload', ensureAuthenticated, function (req, res){
 
+      
+
     //This works only if one file is uploaded at a time
     var file_name=req.files.upload.originalFilename;
     
@@ -261,7 +263,6 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     
     // console.log(usage_restrictions.length);
 
-//    fs.rename(path, './uploads/' + file_name, function(e) {
     fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
     
  
@@ -270,10 +271,20 @@ app.post('/upload', ensureAuthenticated, function (req, res){
 
       var message = 'File '+ file_name + ' of size '+ size + ' bytes uploaded!';
 
-      res.render('upload', {  title: 'Select a Photo to upload ', 
-                        id: 'upload', 
-                        brand: brand,
-                        message: message });
+      //Check if the request is made by the extension or not
+      //If it is the chrome extension, do not send the HTML back
+
+      if (req.headers.extension == 'true'){
+        console.log("**********************************inside post");
+        res.send(message);
+      }
+      else {
+        res.render('upload', {  title: 'Select a Photo to upload ', 
+                          id: 'upload', 
+                          brand: brand,
+                          message: message });
+        
+      }
       
       //Housekeeping
       //photo_collection.remove(function(err, result) {});
