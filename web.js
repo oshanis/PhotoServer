@@ -20,6 +20,8 @@ var GOOGLE_CLIENT_ID = config.GOOGLE_CLIENT_ID,
     GOOGLE_CALLBACK_URL = config.GOOGLE_CALLBACK_URL,
     server_url = config.server_url;
 
+var brand = config.brand;
+
 
 //Setting the usage restrictions for the images served from this website
 //Make sure to call next() only when the call to the db is complete
@@ -44,8 +46,9 @@ var MongoClient = require('mongodb').MongoClient;
 
 var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
-  'mongodb://localhost:27017/exampleDb' ||
-  'mongodb://ec2-54-186-231-154.us-west-2.compute.amazonaws.com:27017/exampleDb';
+  config.mongodb;
+  // 'mongodb://localhost:27017/exampleDb' ||
+  // 'mongodb://ec2-54-186-231-154.us-west-2.compute.amazonaws.com:27017/exampleDb';
 
 //Database docs
 var collection;
@@ -53,7 +56,6 @@ var user_collection;
 var photo_collection;
 var provenance_collection;
 
-var brand = 'PhotoRM';
 
 // Connect to the db
 module.exports = MongoClient.connect(mongoUri, function(err, db) {
@@ -275,7 +277,6 @@ app.post('/upload', ensureAuthenticated, function (req, res){
       //If it is the chrome extension, do not send the HTML back
 
       if (req.headers.extension == 'true'){
-        console.log("**********************************inside post");
         res.send(message);
       }
       else {
