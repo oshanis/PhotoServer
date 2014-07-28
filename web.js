@@ -23,24 +23,6 @@ var GOOGLE_CLIENT_ID = config.GOOGLE_CLIENT_ID,
 var brand = config.brand;
 
 
-//Setting the usage restrictions for the images served from this website
-//Make sure to call next() only when the call to the db is complete
-//Otherwise no usage_restrictions will be set on the request
-app.use(function(req, res, next) {
-  var matchUrl = '/';
-  if(req.url.substring(0, matchUrl.length) === matchUrl) {
-    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
-       if (item){
-        res.setHeader("Usage-Restrictions", item.usage_restrictions);
-       }
-       return next();
-    });
-
-  }
-
-});
-
-
 // Database Settings
 var MongoClient = require('mongodb').MongoClient;
 
@@ -68,6 +50,26 @@ module.exports = MongoClient.connect(mongoUri, function(err, db) {
     //Instantiate the users table to store their data
     user_collection = db.collection('users');
     photo_collection = db.collection('photos');
+});
+
+
+
+//Setting the usage restrictions for the images served from this website
+//Make sure to call next() only when the call to the db is complete
+//Otherwise no usage_restrictions will be set on the request
+app.use(function(req, res, next) {
+  var matchUrl = '/';
+  console.log(mongoUri);
+  if(req.url.substring(0, matchUrl.length) === matchUrl) {
+    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
+       if (item){
+        res.setHeader("Usage-Restrictions", item.usage_restrictions);
+       }
+       return next();
+    });
+
+  }
+
 });
 
 
