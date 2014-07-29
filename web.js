@@ -231,8 +231,6 @@ app.get('/myphotos',
 
 app.post('/upload', ensureAuthenticated, function (req, res){
 
-      
-
     //This works only if one file is uploaded at a time
     var file_name=req.files.upload.originalFilename;
     
@@ -240,16 +238,6 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     if (file_name == 'blob'){
       file_name = randomstring.generate(8) + '.png';
     }
-
-    //todo: check to see if this file already exists
-    // var file = photo_collection.find({_id: server_url+'/upload/' + file_name }, {_id: 1}).limit(1);
-    // console.log(file);
-
-    // while (fileNameExists(file_name)){ 
-    //   file_name = randomstring.generate(8) + '.png';
-    // }
-    
-
 
     var path = req.files.upload.path;
     var size = req.files.upload.size;
@@ -264,32 +252,14 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     // }
     
     // console.log(usage_restrictions.length);
-
-    fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
     
- 
-      // Do what ever else you need to do.
-      res.setHeader("upload-complete", "true");
+    //Housekeeping
+    //photo_collection.remove(function(err, result) {});
 
-      var message = 'File '+ file_name + ' of size '+ size + ' bytes uploaded!';
 
-      //Check if the request is made by the extension or not
-      //If it is the chrome extension, do not send the HTML back
+    var additional_message;
 
-      if (req.headers.extension == 'true'){
-        res.send(message);
-      }
-      else {
-        res.render('upload', {  title: 'Select a Photo to upload ', 
-                          id: 'upload', 
-                          brand: brand,
-                          message: message });
-        
-      }
-      
-      //Housekeeping
-      //photo_collection.remove(function(err, result) {});
-
+    function insertPhotoToDB(file_name, additional_message){
       //add the image location to the database
       var current_date = new Date();
       
@@ -306,10 +276,49 @@ app.post('/upload', ensureAuthenticated, function (req, res){
                                                   req.headers['usage_restrictions'] : 
                                                   req.body.usage_restrictions,
                         }];
+      photo_collection.insert(photo_data, {w:1}, function(err, result) {
+        if (err){
+          //This file already exists, create a new name for it
+          var myRe = /\.[0-9a-z]+$/i;
+          var extension = myRe.exec(file_name)[0];
+          old_file_name = file_name;
+          file_name = randomstring.generate(8) + extension;
 
-      photo_collection.insert(photo_data, {w:1}, function(err, result) {});
+          additional_message = "Filename " + old_file_name + " already exists. Therefore renamed it to " + file_name; 
+          insertPhotoToDB(file_name, additional_message);        
+        }
+        else{
+            fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
 
-    });
+            // Do what ever else you need to do.
+            res.setHeader("upload-complete", "true");
+
+            var message = additional_message + ' File '+ file_name + ' of size '+ size + ' bytes uploaded!' ;
+
+            //Check if the request is made by the extension or not
+            //If it is the chrome extension, do not send the HTML back
+
+            if (req.headers.extension == 'true'){
+              res.send(message);
+            }
+            else {
+              res.render('upload', {  title: 'Select a Photo to upload ', 
+                                id: 'upload', 
+                                brand: brand,
+                                message: message });
+              
+            }
+            
+          });
+        }
+      });
+
+    }
+
+    insertPhotoToDB(file_name, additional_message);
+
+
+
 });
 
 
