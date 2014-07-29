@@ -36,6 +36,15 @@ var user_collection;
 var photo_collection;
 var provenance_collection;
 
+//Middleware to handle app crashes gracefully
+app.use(function (error, req, res, next) {
+  if (!error) {
+    next();
+  } else {
+    console.error(error.stack);
+    res.send(500);
+  }
+});
 
 // Connect to the db
 module.exports = MongoClient.connect(mongoUri, function(err, db) {
@@ -242,22 +251,12 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     var path = req.files.upload.path;
     var size = req.files.upload.size;
     
-    //var usage_restrictions = req.body.usage_restrictions; //let's assume there's only one
 
-    // if ((typeof usage_restrictions) == "string"){
-    //   usage_restrictions.push(req.body.usage_restrictions);
-    // }
-    // else{
-    //   usage_restrictions = req.body.usage_restrictions;
-    // }
-    
-    // console.log(usage_restrictions.length);
-    
     //Housekeeping
     //photo_collection.remove(function(err, result) {});
 
 
-    var additional_message;
+    var additional_message = '';
 
     function insertPhotoToDB(file_name, additional_message){
       //add the image location to the database
@@ -284,11 +283,57 @@ app.post('/upload', ensureAuthenticated, function (req, res){
           old_file_name = file_name;
           file_name = randomstring.generate(8) + extension;
 
-          additional_message = "Filename " + old_file_name + " already exists. Therefore renamed it to " + file_name; 
+          additional_message += "Filename " + old_file_name + " already exists. Therefore renamed it to " + file_name; 
           insertPhotoToDB(file_name, additional_message);        
         }
         else{
             fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
+
+            //Update the Provenance Tracker of this addition
+            var data = {
+              _id : photo_data[0]._id,
+              sources : [],
+              derivatives : [],
+              meta : {
+                      user : photo_data[0].user,
+                      usage_restrictions : photo_data[0].usage_restrictions
+              }
+            };
+            var post_data = JSON.stringify(data);
+
+            var headers = {
+              'Content-Type': 'application/json',
+              'Content-Length': post_data.length
+            };
+
+            var options = {
+              host : 'provenance-tracker.herokuapp.com',
+              port : 80,
+              path : '/logs_temp',
+              method : 'POST',
+              headers : headers
+            };
+
+            var ptn_req = http.request(options, function(ptn_res){
+              ptn_res.setEncoding('utf-8');
+              var ptn_res_string = '';
+              
+              ptn_res.on('data', function(chunk){
+                ptn_res_string += chunk;
+              });
+
+              ptn_res.on('end', function(){
+                console.log(JSON.parse(ptn_res_string));
+              });
+
+              ptn_res.on('error', function(e){
+                console.log(e);
+              })
+
+            });
+
+            ptn_req.write(post_data);
+            ptn_req.end();
 
             // Do what ever else you need to do.
             res.setHeader("upload-complete", "true");
@@ -297,7 +342,6 @@ app.post('/upload', ensureAuthenticated, function (req, res){
 
             //Check if the request is made by the extension or not
             //If it is the chrome extension, do not send the HTML back
-
             if (req.headers.extension == 'true'){
               res.send(message);
             }
@@ -316,8 +360,6 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     }
 
     insertPhotoToDB(file_name, additional_message);
-
-
 
 });
 
