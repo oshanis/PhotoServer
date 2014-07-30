@@ -31,15 +31,14 @@ block content
 						td
 							input(class="btn btn-primary", type="button", value="Audit", onclick='audit("#{photo._id}")')
 		
-	#myModal.modal.fade.bs-example-modal-lg(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+	#myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true', data-show='true')
 		.modal-dialog
 			.modal-content
 				.modal-header
 					button.close(type='button', data-dismiss='modal')
 						span(aria-hidden='true') ×
 						span.sr-only Close
-					h4#myModalLabel.modal-title Access and Usage Log
+					h4#myModalLabel.modal-title Audit Accesses and Usages of Your Photo
 					.modal-body
-						| None
 					.modal-footer
 					button.btn.btn-default(type='button', data-dismiss='modal') Close 
