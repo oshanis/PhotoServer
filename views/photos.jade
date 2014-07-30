@@ -6,17 +6,24 @@ block content
 		thead
 			tr 
 				th Photo
-				th User
+				th By
 				th Usage Restrictions
 				th Date Uploaded
 		tbody
 			each photo in photos
 				tr
-					td
+					td(class="col-md-3")
 						a(href= photo._id)
-							img(src= "#{photo._id}", width="100px") 
-					td
+							img(src= "#{photo._id}", width="200px") 
+					td(class="col-md-2")
 						a(href= photo.user)  #{photo.name}
-					td= photo.usage_restrictions
-					td= photo.uploaded
+					td(class="col-md-4")
+						each usage_restriction in photo.usage_restrictions
+								p 
+									a(href= "#{usage_restriction.url}")
+										| #{usage_restriction.label}
+					td(class="col-md-3")= photo.uploaded
+
+							
+
 	
