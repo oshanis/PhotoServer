@@ -8,7 +8,6 @@ var express = require("express"),
     formidable = require('formidable'),
     util = require('util')
     fs   = require('fs'),
-    qt   = require('quickthumb'),
     passport = require('passport'),
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
     randomstring = require("randomstring"),
@@ -61,25 +60,6 @@ module.exports = MongoClient.connect(mongoUri, function(err, db) {
 
 
 
-//Setting the usage restrictions for the images served from this website
-//Make sure to call next() only when the call to the db is complete
-//Otherwise no usage_restrictions will be set on the request
-app.use(function(req, res, next) {
-  var matchUrl = '/';
-  console.log(mongoUri);
-  if(req.url.substring(0, matchUrl.length) === matchUrl) {
-    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
-       if (item){
-        res.setHeader("Usage-Restrictions", item.usage_restrictions);
-       }
-       return next();
-    });
-
-  }
-
-});
-
-
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
 //   serialize users into and deserialize users out of the session.  Typically,
@@ -124,10 +104,9 @@ app.set('view engine', 'jade');
 
 
 app.use(logfmt.requestLogger());
-app.use(qt.static(__dirname + '/')); // Use quickthumb
 app.use(express.logger());
 app.use(express.cookieParser());
-app.use(express.bodyParser({uploadDir:'./uploads'}));
+//app.use(express.bodyParser({uploadDir:'./uploads'}));
 app.use(express.methodOverride());
 app.use(express.session({ secret: 'keyboard cat' }));
 // Initialize Passport!  Also use passport.session() middleware, to support
@@ -136,8 +115,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
-
-
 
 app.get('/', routes.index);
 
@@ -363,7 +340,69 @@ app.post('/upload', ensureAuthenticated, function (req, res){
 
 });
 
+app.get('/uploads/:filename', ensureAuthenticated, function(req, res){
 
+    photo_collection.findOne({"_id":server_url+req.url}, function(err, item) {
+       if (item){
+        //Setting the usage restrictions for the images served from this website
+
+        res.setHeader("Usage-Restrictions", item.usage_restrictions);
+        res.sendfile(__dirname + '/uploads/' + req.params['filename']);
+
+        //Update the PTN
+        var data = {
+          user: req.user._json.link,          
+        };
+
+        var data_string = JSON.stringify(data);
+
+        var headers = {
+          'Content-Type': 'application/json',
+          'Content-Length': data_string.length
+        };
+
+        var options = {
+          host: "provenance-tracker.herokuapp.com",
+          port: 80,
+          path: '/logs_temp/access/'+ encodeURIComponent(server_url+req.url),
+          method: 'PUT',
+          headers: headers
+        }
+
+        var ptn_req = http.request(options, function(ptn_res){
+
+            ptn_res.setEncoding('utf-8');
+
+            var responseString = '';
+
+            ptn_res.on('data', function(data) {
+              responseString += data;
+            });
+
+            ptn_res.on('end', function() {
+              var resultObject = JSON.parse(responseString);
+              if (resultObject.msg = 'error'){
+                console.log("The log record for the resource does not exist on the provenance tracking network.");
+              }
+              
+            });
+
+        });
+
+        ptn_req.write(data_string);
+        ptn_req.end();
+
+
+       }
+       else {
+        res.writeHead(404, {"Content-Type": "text/plain"});
+        res.write("404 Not Found\n");
+        res.end();
+       }
+
+    });
+
+});
 
 //var port = Number(process.env.PORT || 8080) ;
 var port = 8080 ;
