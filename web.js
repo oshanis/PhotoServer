@@ -203,7 +203,7 @@ app.get('/myphotos',
           //console.log(req.user._json.link);
           var user = (req.user == undefined) ? req.headers['user'] : req.user._json.link;
           photo_collection.find({'user': user}).toArray(function(err, items) {
-            console.log(JSON.stringify(items));
+            //console.log(JSON.stringify(items));
             var locals = {
               title: "Your Photos",
               photos: items,
@@ -244,13 +244,16 @@ app.post('/upload', ensureAuthenticated, function (req, res){
                           user:     (req.user == undefined) ? 
                                         req.headers['user_uri'] : 
                                         req.user._json.link ,
-                          username: (req.user == undefined) ? 
+                          name: (req.user == undefined) ? 
                                         req.headers['user_name'] : 
                                         req.user.displayName,
+                          email: (req.user == undefined) ? 
+                                        req.headers['user_email'] : 
+                                        req.user._json.email,
                           uploaded: current_date,
                           usage_restrictions: (req.body.usage_restrictions == undefined) ? 
                                                   req.headers['usage_restrictions'] : 
-                                                  req.body.usage_restrictions,
+                                                  JSON.parse(" [ " + req.body.usage_restrictions + " ] "),
                         }];
       photo_collection.insert(photo_data, {w:1}, function(err, result) {
         if (err){
@@ -273,6 +276,8 @@ app.post('/upload', ensureAuthenticated, function (req, res){
               derivatives : [],
               meta : {
                       user : photo_data[0].user,
+                      name: photo_data[0].name,
+                      email: photo_data[0].email,
                       usage_restrictions : photo_data[0].usage_restrictions
               }
             };
@@ -352,7 +357,9 @@ app.get('/uploads/:filename', ensureAuthenticated, function(req, res){
         //Update the PTN if the access is by someone other than the owner of the resource
         if (item.user != req.user._json.link){
           var data = {
-            user: req.user._json.link,          
+            user: req.user._json.link,
+            name: req.user.displayName,
+            email: req.user._json.email          
           };
 
           var data_string = JSON.stringify(data);

@@ -1,35 +1,45 @@
 extends layout
 
 block content
-	h1= title
-	table(border='1',cellpadding='10')
-		thead
-			tr 
-				th Photo
-				th Usage Restrictions
-				th Date Uploaded
-				th
-		tbody
-			each photo in photos
-				tr
-					td
-						a(href= photo._id)
-							img(src= "#{photo._id}", width="200px") 
-					td= photo.usage_restrictions
-					td= photo.uploaded
-					td
-						input(class="btn btn-primary", type="button", value="Audit", onclick='audit("#{photo._id}")')
-	
-	#myModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+	-if(photos.length == 0)
+		p You have no photos. Go  
+			a(href="/upload") upload 
+			| some!
+	-else
+		h1= title
+		table(border='1',cellpadding='10')
+			thead
+				tr 
+					th Photo
+					th Details
+					th
+			tbody
+				each photo in photos
+					tr
+						td
+							a(href= photo._id)
+								img(src= "#{photo._id}", width="200px") 
+						td
+							h4 Usage Restrictions
+							each usage_restriction in photo.usage_restrictions
+								p 
+									a(href= "#{usage_restriction.url}")
+										| #{usage_restriction.label}
+							br
+							h4 Uploaded on
+							p #{photo.uploaded}
+						td
+							input(class="btn btn-primary", type="button", value="Audit", onclick='audit("#{photo._id}")')
+		
+	#myModal.modal.fade.bs-example-modal-lg(tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
 		.modal-dialog
 			.modal-content
 				.modal-header
 					button.close(type='button', data-dismiss='modal')
 						span(aria-hidden='true') ×
 						span.sr-only Close
-					h4#myModalLabel.modal-title Modal title
+					h4#myModalLabel.modal-title Access and Usage Log
 					.modal-body
-						| ...
+						| None
 					.modal-footer
 					button.btn.btn-default(type='button', data-dismiss='modal') Close 
-					button.btn.btn-primary(type='button') Save changes
