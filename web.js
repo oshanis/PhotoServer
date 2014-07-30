@@ -106,7 +106,7 @@ app.set('view engine', 'jade');
 app.use(logfmt.requestLogger());
 app.use(express.logger());
 app.use(express.cookieParser());
-//app.use(express.bodyParser({uploadDir:'./uploads'}));
+app.use(express.bodyParser({uploadDir:'./uploads'}));
 app.use(express.methodOverride());
 app.use(express.session({ secret: 'keyboard cat' }));
 // Initialize Passport!  Also use passport.session() middleware, to support
@@ -187,7 +187,7 @@ app.get('/printphotos', function(req, res){
   photo_collection.find().toArray(function(err, items) {
   
     var locals = {
-      title: "Uploaded Photos",
+      title: "All Photos",
       photos: items,
       brand: brand,
     };
@@ -205,12 +205,12 @@ app.get('/myphotos',
           photo_collection.find({'user': user}).toArray(function(err, items) {
             console.log(JSON.stringify(items));
             var locals = {
-              title: "Uploaded Photos",
+              title: "Your Photos",
               photos: items,
               brand: brand,
             };
 
-            res.render('photos', locals);
+            res.render('myphotos', locals);
           });
 
 });
@@ -349,49 +349,52 @@ app.get('/uploads/:filename', ensureAuthenticated, function(req, res){
         res.setHeader("Usage-Restrictions", item.usage_restrictions);
         res.sendfile(__dirname + '/uploads/' + req.params['filename']);
 
-        //Update the PTN
-        var data = {
-          user: req.user._json.link,          
-        };
+        //Update the PTN if the access is by someone other than the owner of the resource
+        if (item.user != req.user._json.link){
+          var data = {
+            user: req.user._json.link,          
+          };
 
-        var data_string = JSON.stringify(data);
+          var data_string = JSON.stringify(data);
 
-        var headers = {
-          'Content-Type': 'application/json',
-          'Content-Length': data_string.length
-        };
+          var headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': data_string.length
+          };
 
-        var options = {
-          host: "provenance-tracker.herokuapp.com",
-          port: 80,
-          path: '/logs_temp/access/'+ encodeURIComponent(server_url+req.url),
-          method: 'PUT',
-          headers: headers
+          var options = {
+            host: "provenance-tracker.herokuapp.com",
+            port: 80,
+            path: '/logs_temp/access/'+ encodeURIComponent(server_url+req.url),
+            method: 'PUT',
+            headers: headers
+          }
+
+          var ptn_req = http.request(options, function(ptn_res){
+
+              ptn_res.setEncoding('utf-8');
+
+              var responseString = '';
+
+              ptn_res.on('data', function(data) {
+                responseString += data;
+              });
+
+              ptn_res.on('end', function() {
+                var resultObject = JSON.parse(responseString);
+                if (resultObject.msg = 'error'){
+                  console.log("The log record for the resource does not exist on the provenance tracking network.");
+                }
+                
+              });
+
+          });
+
+          ptn_req.write(data_string);
+          ptn_req.end();
+
+
         }
-
-        var ptn_req = http.request(options, function(ptn_res){
-
-            ptn_res.setEncoding('utf-8');
-
-            var responseString = '';
-
-            ptn_res.on('data', function(data) {
-              responseString += data;
-            });
-
-            ptn_res.on('end', function() {
-              var resultObject = JSON.parse(responseString);
-              if (resultObject.msg = 'error'){
-                console.log("The log record for the resource does not exist on the provenance tracking network.");
-              }
-              
-            });
-
-        });
-
-        ptn_req.write(data_string);
-        ptn_req.end();
-
 
        }
        else {
