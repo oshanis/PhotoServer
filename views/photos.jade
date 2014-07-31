@@ -8,7 +8,6 @@ block content
 				th Photo
 				th By
 				th Usage Restrictions
-				th Date Uploaded
 		tbody
 			each photo in photos
 				tr
@@ -22,7 +21,7 @@ block content
 								p 
 									a(href= "#{usage_restriction.url}")
 										| #{usage_restriction.label}
-					td(class="col-md-3")= photo.uploaded
+
 
 							
 

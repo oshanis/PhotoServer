@@ -182,7 +182,7 @@ app.get('/printusers', function(req, res){
 
 });
 
-app.get('/printphotos', function(req, res){
+app.get('/allphotos', ensureAuthenticated, function(req, res){
 
   photo_collection.find().toArray(function(err, items) {
   
