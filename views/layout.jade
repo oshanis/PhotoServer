@@ -15,7 +15,7 @@ html
             a.navbar-brand(href='/') #{brand}
           .navbar-collapse.collapse
             ul.nav.navbar-nav
-              - var obj = { 'upload':'Upload Photo', 'myphotos':'My Photos', 'allphotos': 'All Photos' }
+              - var obj = { 'upload':'Upload Photo', 'myphotos':'My Photos', 'allphotos': 'All Photos', 'account' : 'Account' }
                 - each val, key in obj
                   - if (id == key)
                     li.active

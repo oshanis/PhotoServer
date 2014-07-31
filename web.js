@@ -154,7 +154,7 @@ app.get('/oauth2callback',
     user_collection.insert(user_data, {w:1}, function(err, result) {});
 
     // Successful authentication, redirect to account.
-    res.redirect('/account');
+    res.redirect('/myphotos');
 });
 
 
@@ -220,128 +220,143 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     //This works only if one file is uploaded at a time
     var file_name=req.files.upload.originalFilename;
     
-    //For uploads from the chrome extension
-    if (file_name == 'blob'){
-      file_name = randomstring.generate(8) + '.png';
-    }
-
-    var path = req.files.upload.path;
-    var size = req.files.upload.size;
-    
-
-    //Housekeeping
-    //photo_collection.remove(function(err, result) {});
-
-
-    var additional_message = '';
-
-    function insertPhotoToDB(file_name, additional_message){
-      //add the image location to the database
-      var current_date = new Date();
+    if (file_name.match(/\.(jpeg|jpg|gif|png)$/) == null){
       
-      var photo_data = [{
-                          _id:      server_url + '/uploads/' + file_name, 
-                          user:     (req.user == undefined) ? 
-                                        req.headers['user_uri'] : 
-                                        req.user._json.link ,
-                          name: (req.user == undefined) ? 
-                                        req.headers['user_name'] : 
-                                        req.user.displayName,
-                          email: (req.user == undefined) ? 
-                                        req.headers['user_email'] : 
-                                        req.user._json.email,
-                          uploaded: current_date,
-                          usage_restrictions: (req.body.usage_restrictions == undefined) ? 
-                                                  req.headers['usage_restrictions'] : 
-                                                  JSON.parse(" [ " + req.body.usage_restrictions + " ] "),
-                        }];
-      photo_collection.insert(photo_data, {w:1}, function(err, result) {
-        if (err){
-          //This file already exists, create a new name for it
-          var myRe = /\.[0-9a-z]+$/i;
-          var extension = myRe.exec(file_name)[0];
-          old_file_name = file_name;
-          file_name = randomstring.generate(8) + extension;
+      res.render('error', {  
+        message: 'Please upload a file of any of these types ( jpeg | jpg | gif | png ) please.'});
 
-          additional_message += "Filename " + old_file_name + " already exists. Therefore renamed it to " + file_name; 
-          insertPhotoToDB(file_name, additional_message);        
-        }
-        else{
-            fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
+    }
+    else{
 
-            //Update the Provenance Tracker of this addition
-            var data = {
-              _id : photo_data[0]._id,
-              sources : [],
-              derivatives : [],
-              meta : {
-                      user : photo_data[0].user,
-                      name: photo_data[0].name,
-                      email: photo_data[0].email,
-                      usage_restrictions : photo_data[0].usage_restrictions
+      console.log("^^^^ why am I here?");
+
+      //For uploads from the chrome extension
+      if (file_name == 'blob'){
+        file_name = randomstring.generate(8) + '.png';
+      }
+
+      var path = req.files.upload.path;
+      var size = req.files.upload.size;
+      
+
+      //Housekeeping
+      //photo_collection.remove(function(err, result) {});
+
+
+      var additional_message = '';
+
+      function insertPhotoToDB(file_name, additional_message){
+        //add the image location to the database
+        var current_date = new Date();
+        
+        var photo_data = [{
+                            _id:      server_url + '/uploads/' + file_name, 
+                            user:     (req.user == undefined) ? 
+                                          req.headers['user_uri'] : 
+                                          req.user._json.link ,
+                            name: (req.user == undefined) ? 
+                                          req.headers['user_name'] : 
+                                          req.user.displayName,
+                            email: (req.user == undefined) ? 
+                                          req.headers['user_email'] : 
+                                          req.user._json.email,
+                            uploaded: current_date,
+                            usage_restrictions: (req.body.usage_restrictions == undefined) ? 
+                                                    req.headers['usage_restrictions'] : 
+                                                    JSON.parse(" [ " + req.body.usage_restrictions + " ] "),
+                          }];
+        photo_collection.insert(photo_data, {w:1}, function(err, result) {
+          if (err){
+            //This file already exists, create a new name for it
+            var myRe = /\.[0-9a-z]+$/i;
+            var extension = myRe.exec(file_name)[0];
+            old_file_name = file_name;
+            file_name = randomstring.generate(8) + extension;
+
+            additional_message += "Filename " + old_file_name + " already exists. Therefore renamed it to " + file_name; 
+            insertPhotoToDB(file_name, additional_message);        
+          }
+          else{
+              fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
+
+              //Update the Provenance Tracker of this addition
+              var data = {
+                _id : photo_data[0]._id,
+                sources : [],
+                derivatives : [],
+                meta : {
+                        user : photo_data[0].user,
+                        name: photo_data[0].name,
+                        email: photo_data[0].email,
+                        usage_restrictions : photo_data[0].usage_restrictions
+                }
+              };
+              var post_data = JSON.stringify(data);
+
+              var headers = {
+                'Content-Type': 'application/json',
+                'Content-Length': post_data.length
+              };
+
+              var options = {
+                host : 'provenance-tracker.herokuapp.com',
+                port : 80,
+                path : '/logs_temp',
+                method : 'POST',
+                headers : headers
+              };
+
+              var ptn_req = http.request(options, function(ptn_res){
+                ptn_res.setEncoding('utf-8');
+                var ptn_res_string = '';
+                
+                ptn_res.on('data', function(chunk){
+                  ptn_res_string += chunk;
+                });
+
+                ptn_res.on('end', function(){
+                  console.log(JSON.parse(ptn_res_string));
+                });
+
+                ptn_res.on('error', function(e){
+                  console.log(e);
+                })
+
+              });
+
+              ptn_req.write(post_data);
+              ptn_req.end();
+
+              // Do what ever else you need to do.
+              res.setHeader("upload-complete", "true");
+
+              var message = additional_message + ' File '+ file_name + ' of size '+ size + ' bytes uploaded!' ;
+
+              //Check if the request is made by the extension or not
+              //If it is the chrome extension, do not send the HTML back
+              if (req.headers.extension == 'true'){
+                res.send(message);
               }
-            };
-            var post_data = JSON.stringify(data);
-
-            var headers = {
-              'Content-Type': 'application/json',
-              'Content-Length': post_data.length
-            };
-
-            var options = {
-              host : 'provenance-tracker.herokuapp.com',
-              port : 80,
-              path : '/logs_temp',
-              method : 'POST',
-              headers : headers
-            };
-
-            var ptn_req = http.request(options, function(ptn_res){
-              ptn_res.setEncoding('utf-8');
-              var ptn_res_string = '';
+              else {
+                res.render('upload', {  title: 'Select a Photo (jpeg|jpg|gif|png) to upload ', 
+                                  id: 'upload', 
+                                  brand: brand,
+                                  message: message });
+                
+              }
               
-              ptn_res.on('data', function(chunk){
-                ptn_res_string += chunk;
-              });
-
-              ptn_res.on('end', function(){
-                console.log(JSON.parse(ptn_res_string));
-              });
-
-              ptn_res.on('error', function(e){
-                console.log(e);
-              })
-
             });
+          }
+        });
 
-            ptn_req.write(post_data);
-            ptn_req.end();
+      }
 
-            // Do what ever else you need to do.
-            res.setHeader("upload-complete", "true");
+      insertPhotoToDB(file_name, additional_message);
 
-            var message = additional_message + ' File '+ file_name + ' of size '+ size + ' bytes uploaded!' ;
-
-            //Check if the request is made by the extension or not
-            //If it is the chrome extension, do not send the HTML back
-            if (req.headers.extension == 'true'){
-              res.send(message);
-            }
-            else {
-              res.render('upload', {  title: 'Select a Photo to upload ', 
-                                id: 'upload', 
-                                brand: brand,
-                                message: message });
-              
-            }
-            
-          });
-        }
-      });
 
     }
 
-    insertPhotoToDB(file_name, additional_message);
+
 
 });
 
