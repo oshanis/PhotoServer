@@ -8,7 +8,7 @@ exports.index = function(req, res){
 
 	var locals = {
         title: brand,
-        subtitle: 'A Photo Sharing App to demonstrate HTTPA',
+//        subtitle: 'A Photo Sharing App to demonstrate HTTPA',
         id: 'home', 
         brand: brand,
         user: req.user
