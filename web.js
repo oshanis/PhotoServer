@@ -449,7 +449,7 @@ function ensureAuthenticated(req, res, next) {
   //with Google
   if (req.isAuthenticated() || req.headers['user_uri'] != undefined ) { return next(); }
   if (req.headers['extension'] == 'true'){
-    res.send(server_url);
+    res.send("error");
   }
   else{
       res.redirect('/');
