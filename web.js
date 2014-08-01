@@ -220,15 +220,13 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     //This works only if one file is uploaded at a time
     var file_name=req.files.upload.originalFilename;
     
-    if (file_name.match(/\.(jpeg|jpg|gif|png)$/) == null){
+    if (file_name.match(/\.(jpeg|jpg|gif|png)$/) == null && file_name != 'blob'){
       
       res.render('error', {  
         message: 'Please upload a file of any of these types ( jpeg | jpg | gif | png ) please.'});
 
     }
     else{
-
-      console.log("^^^^ why am I here?");
 
       //For uploads from the chrome extension
       if (file_name == 'blob'){
@@ -249,6 +247,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
         //add the image location to the database
         var current_date = new Date();
         
+
         var photo_data = [{
                             _id:      server_url + '/uploads/' + file_name, 
                             user:     (req.user == undefined) ? 
@@ -262,7 +261,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
                                           req.user._json.email,
                             uploaded: current_date,
                             usage_restrictions: (req.body.usage_restrictions == undefined) ? 
-                                                    req.headers['usage_restrictions'] : 
+                                                    JSON.parse(req.headers['usage_restrictions']) : 
                                                     JSON.parse(" [ " + req.body.usage_restrictions + " ] "),
                           }];
         photo_collection.insert(photo_data, {w:1}, function(err, result) {
@@ -279,6 +278,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
           else{
               fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
 
+              
               //Update the Provenance Tracker of this addition
               var data = {
                 _id : photo_data[0]._id,
@@ -289,6 +289,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
                         name: photo_data[0].name,
                         email: photo_data[0].email,
                         usage_restrictions : photo_data[0].usage_restrictions
+
                 }
               };
               var post_data = JSON.stringify(data);
@@ -335,7 +336,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
               //Check if the request is made by the extension or not
               //If it is the chrome extension, do not send the HTML back
               if (req.headers.extension == 'true'){
-                res.send(message);
+                res.send(server_url+ '/uploads/'+file_name);
               }
               else {
                 res.render('upload', {  title: 'Select a Photo (jpeg|jpg|gif|png) to upload ', 
