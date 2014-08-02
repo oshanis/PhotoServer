@@ -1,11 +1,22 @@
 extends layout
 block content
-	h1 Welcome to #{title}
-	h4 #{subtitle}
-	br
 	if (user == undefined) 
-		a(href= "/auth/google")= "Please login with your Google Plus Profile"
+		p(align="right") 
+			a(href= "/auth/google", class="btn btn-default", role="button") 
+				span(class="glyphicon glyphicon-user")
+				| Login using Google+
 	else
-		p You are logged in as 
+		p(align="right") You are logged in as 
 			a(href= user._json.link) #{user.displayName}
+	h1 Welcome to #{title}
+	h3 #{subtitle}
+	br
+	p(style="font-size: smaller") 
+		| This is photo sharing website that allows you to upload photos and attach a 
+		a(href="https://creativecommons.org/licenses/") Creative Commons license 
+		| or a usage restriction of your choice. 
+		| You can audit how  your images have been used by other users on this site and others that use 
+		a(href="https://chrome.google.com/webstore/detail/accountable-meme-generato/dkblghmloenhlmcamapdfdlabjmcghca") this Chrome extension
+		|.
+
 	br
