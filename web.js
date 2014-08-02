@@ -220,6 +220,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     //This works only if one file is uploaded at a time
     var file_name=req.files.upload.originalFilename;
     
+    
     if (file_name.match(/\.(jpeg|jpg|gif|png)$/) == null && file_name != 'blob'){
       
       res.render('error', {  

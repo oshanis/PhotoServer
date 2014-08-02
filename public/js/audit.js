@@ -39,7 +39,10 @@ function audit(resource){
 					//user_a.href = JSON.stringify(data[i].details.user);
 					derivative_a.href = data[i].derivative;
 					derivative_a.target = "_blank";
-					derivative_a.appendChild(document.createTextNode(data[i].derivative + " "));
+					var derivative_location = 	data[i].derivative == undefined ? 
+												data[i].details.derivative :
+												data[i].derivative;
+					derivative_a.appendChild(document.createTextNode(derivative_location + " "));
 
 					$( ".modal-body" ).append(derivative_a);
 				 	

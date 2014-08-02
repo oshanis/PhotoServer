@@ -23,4 +23,16 @@ block content
 						option(value='{ "label" : "Attribution-NonCommercial" , 	"url": "https://creativecommons.org/licenses/by-nc/4.0" }') Attribution-NonCommercial
 						option(value='{ "label" : "Attribution-NonCommercial-ShareAlike" , 	"url": "https://creativecommons.org/licenses/by-nc/4.0" }') Attribution-NonCommercial-ShareAlike
 						option(value='{ "label" : "Attribution-NonCommercial-NoDerivs" , 		"url": "https://creativecommons.org/licenses/by-nc-nd/4.0" }') Attribution-NonCommercial-NoDerivs
+				p
+				div
+					i and/or you can enter your own usage restriction for this image
+				div(class="col-sm12")
+					div(style="font-size: smaller") 
+						b(class="col-sm6") Label 
+						input(class="col-sm6", style="font-size: small", type="text", name="custom_ur_label", value="")
+						b(class="col-sm6") &nbsp;Link 
+						input(class="col-sm6", style="font-size: small", type="text", name="custom_ur_link", size="50", value="")
+						
+
+
 			input(class="btn btn-primary", type="submit", value="Upload")
