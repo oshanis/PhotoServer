@@ -13,6 +13,26 @@ var express = require("express"),
     randomstring = require("randomstring"),
     config = require('./config');
 
+app.use(express.bodyParser({limit: '4mb', uploadDir:'./uploads'}));
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+
+
+
+app.use(logfmt.requestLogger());
+app.use(express.logger());
+app.use(express.cookieParser());
+//app.use(express.bodyParser({uploadDir:'./uploads'}));
+app.use(express.methodOverride());
+app.use(express.session({ secret: 'keyboard cat' }));
+// Initialize Passport!  Also use passport.session() middleware, to support
+// persistent login sessions (recommended).
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(app.router);
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 var GOOGLE_CLIENT_ID = config.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET = config.GOOGLE_CLIENT_SECRET,
@@ -40,9 +60,13 @@ app.use(function (error, req, res, next) {
   if (!error) {
     next();
   } else {
-    console.error(error.stack);
-    res.send(500);
-  }
+
+    res.render('error', { message: error });
+
+    }
+
+    // console.error(error.stack);
+    //    res.send(500);
 });
 
 // Connect to the db
@@ -99,22 +123,6 @@ passport.use(new GoogleStrategy({
 ));
 
 
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-
-
-app.use(logfmt.requestLogger());
-app.use(express.logger());
-app.use(express.cookieParser());
-app.use(express.bodyParser({uploadDir:'./uploads'}));
-app.use(express.methodOverride());
-app.use(express.session({ secret: 'keyboard cat' }));
-// Initialize Passport!  Also use passport.session() middleware, to support
-// persistent login sessions (recommended).
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', routes.index);
 
@@ -173,7 +181,7 @@ app.get('/printusers', function(req, res){
   
     var locals = {
       title: "Signed-up Users",
-      users: items
+      users: items 
     };
 
     console.log(JSON.stringify(items));
@@ -220,8 +228,8 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     //This works only if one file is uploaded at a time
     var file_name=req.files.upload.originalFilename;
     
-    
-    if (file_name.match(/\.(jpeg|jpg|gif|png)$/) == null && file_name != 'blob'){
+
+    if (req.files.upload.originalFilename.match(/\.(jpeg|JPEG|jpg|JPG|gif|png|GIF|PNG)$/) == null && file_name != 'blob'){
       
       res.render('error', {  
         message: 'Please upload a file of any of these types ( jpeg | jpg | gif | png ) please.'});
@@ -230,7 +238,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
     else{
 
       //For uploads from the chrome extension
-      if (file_name == 'blob'){
+      if (file_name == 'blob' || !file_name.match(/^[0-9a-zA-Z\._-]*$/)){
         file_name = randomstring.generate(8) + '.png';
       }
 
@@ -340,7 +348,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
                 res.send(server_url+ '/uploads/'+file_name);
               }
               else {
-                res.render('upload', {  title: 'Select a Photo (jpeg|jpg|gif|png) to upload ', 
+                res.render('upload', {  title: 'Select a Photo to upload ', 
                                   id: 'upload', 
                                   brand: brand,
                                   message: message });

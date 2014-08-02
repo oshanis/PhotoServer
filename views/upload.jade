@@ -8,13 +8,14 @@ block content
 			div(class="form-group")
 				label(for="inputfile", class="col-sm2") #{title}:
 				input(class="btn col-sm10" id="inputfile", type="file", name="upload", multiple="multiple")
-				p
-					i Max size 500KB
+				p(style="font-size: smaller")
+					i make sure the width and height are 
+						b at least 50px and not more than 1000px
 			hr
 			div(class="form-group")
 				label(for="usage_restrictions", class="col-sm2") Set Usage Restrictions :
 				p
-					i you can select more than one option clicking with the Command key (Mac) or the Control key (PC)
+					i(style="font-size: smaller") you can select more than one option clicking with the Command key (Mac) or the Control key (PC)
 				div(class="col-sm6")
 					select(multiple, class="form-control col-md-8", name="usage_restrictions", id="usage_restrictions")
 						option(value='{ "label" : "No modification" , 		"url": "http://no-modifications" }') No modification
