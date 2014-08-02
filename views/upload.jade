@@ -8,19 +8,19 @@ block content
 			div(class="form-group")
 				label(for="inputfile", class="col-sm2") #{title}:
 				input(class="btn col-sm10" id="inputfile", type="file", name="upload", multiple="multiple")
-				p(style="font-size: smaller")
-					i make sure the width and height are 
-						b at least 50px and not more than 1000px
+				p
+					i Max size 500KB
 			hr
 			div(class="form-group")
-				label(for="usage_restrictions", class="col-sm2") Set Usage Restrictions :
+				label(for="usage_restrictions", class="col-sm2") Set License(s) or Usage Restriction(s) :
 				p
-					i(style="font-size: smaller") you can select more than one option clicking with the Command key (Mac) or the Control key (PC)
+					i you can select more than one option clicking with the Command key (Mac) or the Control key (PC)
 				div(class="col-sm6")
 					select(multiple, class="form-control col-md-8", name="usage_restrictions", id="usage_restrictions")
-						option(value='{ "label" : "No modification" , 		"url": "http://no-modifications" }') No modification
-						option(value='{ "label" : "No sharing" , 			"url": "http://no-sharing" }') No sharing
-						option(value='{ "label" : "No commercial uses" , 	"url": "http://no-commercial-uses" }') No commercial uses 
-						option(value='{ "label" : "No text additions" , 	"url": "http://no-text-additions" }') No text additions
-						option(value='{ "label" : "No downloading" , 		"url": "http://no-downloading" }') No downloading
+						option(value='{ "label" : "Attribution" , 		"url": "http://creativecommons.org/licenses/by/4.0" }') Attribution
+						option(value='{ "label" : "Attribution-ShareAlike" , 			"url": "https://creativecommons.org/licenses/by-sa/4.0" }') Attribution-ShareAlike
+						option(value='{ "label" : "Attribution-NoDerivs" , 	"url": "https://creativecommons.org/licenses/by-nd/4.0" }') Attribution-NoDerivs 
+						option(value='{ "label" : "Attribution-NonCommercial" , 	"url": "https://creativecommons.org/licenses/by-nc/4.0" }') Attribution-NonCommercial
+						option(value='{ "label" : "Attribution-NonCommercial-ShareAlike" , 	"url": "https://creativecommons.org/licenses/by-nc/4.0" }') Attribution-NonCommercial-ShareAlike
+						option(value='{ "label" : "Attribution-NonCommercial-NoDerivs" , 		"url": "https://creativecommons.org/licenses/by-nc-nd/4.0" }') Attribution-NonCommercial-NoDerivs
 			input(class="btn btn-primary", type="submit", value="Upload")
