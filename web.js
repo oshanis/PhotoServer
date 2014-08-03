@@ -162,7 +162,7 @@ app.get('/oauth2callback',
     user_collection.insert(user_data, {w:1}, function(err, result) {});
 
     // Successful authentication, redirect to account.
-    res.redirect('/myphotos');
+    res.redirect('/account');
 });
 
 
