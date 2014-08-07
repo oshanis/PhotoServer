@@ -192,8 +192,10 @@ app.get('/printusers', function(req, res){
 
 app.get('/allphotos', ensureAuthenticated, function(req, res){
 
-  photo_collection.find().toArray(function(err, items) {
+//  photo_collection.find().toArray(function(err, items) {
   
+  photo_collection.find().sort({ uploaded : -1 }).toArray(function(err, items) {
+
     var locals = {
       title: "All Photos",
       photos: items,

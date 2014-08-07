@@ -7,6 +7,7 @@ block content
 			tr 
 				th Photo
 				th By
+				th uploaded
 				th Usage Restrictions
 		tbody
 			each photo in photos
@@ -16,6 +17,8 @@ block content
 							img(src= "#{photo._id}", width="200px") 
 					td(class="col-md-2")
 						a(href= photo.user)  #{photo.name}
+					td(class="col-md-2")
+						a(href= photo.user)  #{photo.uploaded}
 					td(class="col-md-4")
 						each usage_restriction in photo.usage_restrictions
 								p 
