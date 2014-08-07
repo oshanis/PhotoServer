@@ -162,7 +162,7 @@ app.get('/oauth2callback',
     user_collection.insert(user_data, {w:1}, function(err, result) {});
 
     // Successful authentication, redirect to account.
-    res.redirect('/account');
+    res.redirect('/');
 });
 
 
@@ -338,7 +338,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
                 ptn_req.write(post_data);
                 ptn_req.end();
 
-                
+
               }
               // Do what ever else you need to do.
               res.setHeader("upload-complete", "true");
