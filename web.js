@@ -291,7 +291,7 @@ app.post('/upload', ensureAuthenticated, function (req, res){
               //Update the Provenance Tracker of this addition
               var data = {
                 _id : photo_data[0]._id,
-                sources : [],
+                sources : req.headers['source'] == undefined ? req.headers['source'] : [],
                 derivatives : [],
                 meta : {
                         user : photo_data[0].user,
