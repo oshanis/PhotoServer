@@ -288,55 +288,58 @@ app.post('/upload', ensureAuthenticated, function (req, res){
               fs.rename(path, __dirname + '/uploads/' + file_name, function(e) {
 
               
-              //Update the Provenance Tracker of this addition
-              var data = {
-                _id : photo_data[0]._id,
-                sources : req.headers['source'] == undefined ? [req.headers['source']] : [],
-                derivatives : [],
-                meta : {
-                        user : photo_data[0].user,
-                        name: photo_data[0].name,
-                        email: photo_data[0].email,
-                        usage_restrictions : photo_data[0].usage_restrictions
+              //Update the Provenance Tracker of this addition (only if it is not from the extension)
+              if (req.headers.extension != 'true'){
+                var data = {
+                  _id : photo_data[0]._id,
+                  sources : [],
+                  derivatives : [],
+                  meta : {
+                          user : photo_data[0].user,
+                          name: photo_data[0].name,
+                          email: photo_data[0].email,
+                          usage_restrictions : photo_data[0].usage_restrictions
 
-                }
-              };
-              var post_data = JSON.stringify(data);
+                  }
+                };
+                var post_data = JSON.stringify(data);
 
-              var headers = {
-                'Content-Type': 'application/json',
-                'Content-Length': post_data.length
-              };
+                var headers = {
+                  'Content-Type': 'application/json',
+                  'Content-Length': post_data.length
+                };
 
-              var options = {
-                host : 'provenance-tracker.herokuapp.com',
-                port : 80,
-                path : '/logs_temp',
-                method : 'POST',
-                headers : headers
-              };
+                var options = {
+                  host : 'provenance-tracker.herokuapp.com',
+                  port : 80,
+                  path : '/logs_temp',
+                  method : 'POST',
+                  headers : headers
+                };
 
-              var ptn_req = http.request(options, function(ptn_res){
-                ptn_res.setEncoding('utf-8');
-                var ptn_res_string = '';
+                var ptn_req = http.request(options, function(ptn_res){
+                  ptn_res.setEncoding('utf-8');
+                  var ptn_res_string = '';
+                  
+                  ptn_res.on('data', function(chunk){
+                    ptn_res_string += chunk;
+                  });
+
+                  ptn_res.on('end', function(){
+                    console.log(JSON.parse(ptn_res_string));
+                  });
+
+                  ptn_res.on('error', function(e){
+                    console.log(e);
+                  })
+
+                });
+
+                ptn_req.write(post_data);
+                ptn_req.end();
+
                 
-                ptn_res.on('data', function(chunk){
-                  ptn_res_string += chunk;
-                });
-
-                ptn_res.on('end', function(){
-                  console.log(JSON.parse(ptn_res_string));
-                });
-
-                ptn_res.on('error', function(e){
-                  console.log(e);
-                })
-
-              });
-
-              ptn_req.write(post_data);
-              ptn_req.end();
-
+              }
               // Do what ever else you need to do.
               res.setHeader("upload-complete", "true");
 
